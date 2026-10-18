@@ -4,9 +4,10 @@
 
 ## 脚本
 
-| 脚本                              | 说明                                                                    |
-| --------------------------------- | ----------------------------------------------------------------------- |
-| [GitHub Manager](github-manager/) | 只读 GitHub 浏览器：Stars、探索、作者主页、本地收藏、Release 订阅与下载 |
+| 脚本                                | 说明                                                                    |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| [GitHub Manager](github-manager/)   | 只读 GitHub 浏览器：Stars、探索、作者主页、本地收藏、Release 订阅与下载 |
+| [Fonts Installer](fonts-installer/) | 导入、预览字体并通过描述文件安装，支持可变字体单独字重                  |
 
 ## 安装
 
@@ -20,16 +21,22 @@
 ower/
 ├── scripting/          # 本仓库
 │   ├── tsconfig.json   # 引用 ../scripting-dev/dts
-│   └── github-manager/
+│   ├── github-manager/
+│   └── fonts-installer/
 └── scripting-dev/      # scripting-cli 工作区
     ├── dts/            # App 同步的类型声明
     └── scripts/
-        └── GitHub Manager -> ../../scripting/github-manager
+        ├── GitHub Manager -> ../../scripting/github-manager
+        └── Fonts Installer -> ../../scripting/fonts-installer
 ```
 
 - 实时同步：在 `scripting-dev` 中运行 `npx scripting-cli start --bonjour`，App 连接后保存即同步。
 - 类型检查：在本仓库根目录运行 `npx -p typescript tsc --noEmit -p tsconfig.json`。
 - 新增脚本：创建包含 `script.json` 与 `index.tsx` 的目录，并在 `scripting-dev/scripts` 下建立同名软链接。
+
+## 致谢
+
+- [BlackCCCat](https://github.com/BlackCCCat)：Fonts Installer 原作者。
 
 ## 约定
 
