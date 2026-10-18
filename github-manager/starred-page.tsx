@@ -454,7 +454,8 @@ export default function StarredPage({ presentationStyle = "automatic" }: { prese
     <ZStack frame={{ maxWidth: "infinity", maxHeight: "infinity" }}>
       <PageBackground />
       <NavigationStack>
-        <TabView toolbar={tabToolbar}>
+        {/* iPhone 为底部标签栏；iPad / Mac 宽屏为可收起的侧边栏。 */}
+        <TabView tabViewStyle="sidebarAdaptable" toolbar={tabToolbar}>
           <Tab title="探索" systemImage="sparkles" value="explore"><NavigationStack><ExplorePage mode={mode} onSubscriptionsChange={refreshSubscriptions} /></NavigationStack></Tab>
           <Tab title={favorites.length > 0 ? `收藏 (${favorites.length})` : "收藏"} systemImage="bookmark.fill" value="favorites"><NavigationStack><FavoritesPage onSubscriptionsChange={refreshSubscriptions} /></NavigationStack></Tab>
           <Tab title="Stars" systemImage="star.fill" value="stars"><NavigationStack>{repositoryList}</NavigationStack></Tab>

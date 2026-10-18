@@ -457,7 +457,7 @@ export function invalidatePublicCache(prefix = ""): void {
   Storage.set(PUBLIC_CACHE_INDEX_KEY, index)
 }
 
-// 3.0.1 之前只缓存当前身份，迁移到按用户保存的快照后移除。
+// 3.0.2 之前只缓存当前身份，迁移到按用户保存的快照后移除。
 const LEGACY_STARS_CACHE_KEY = "github-star.cached-stars"
 const LEGACY_STARS_SYNCED_AT_KEY = "github-star.synced-at"
 const LEGACY_STARS_NEXT_PAGE_KEY = "github-star.stars-next-page"

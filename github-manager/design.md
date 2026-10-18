@@ -12,7 +12,7 @@
 ```
 index.tsx
 └─ Navigation.present(StarredPage)      # 循环呈现，支持弹窗 / 全面屏切换
-   └─ TabView
+   └─ TabView (sidebarAdaptable)       # iPhone 底部标签栏，iPad / Mac 可收起侧边栏
       ├─ 探索      ExplorePage
       ├─ 收藏      FavoritesPage
       ├─ Stars     StarredPage 内的列表
