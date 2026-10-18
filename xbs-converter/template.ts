@@ -1,0 +1,46 @@
+// 香色 2.56.1 文本书源骨架（来自 xiangse-sources SKILL.md），新建时在编辑器中填写。
+export const SOURCE_TEMPLATE = JSON.stringify({
+  "example-v1": {
+    sourceName: "站点名-v1",
+    sourceUrl: "https://example.com/",
+    sourceType: "text",
+    enable: 1,
+    weight: "9999",
+    lastModifyTime: "0",
+    miniAppVersion: "2.56.1",
+    searchBook: {
+      actionID: "searchBook",
+      parserID: "DOM",
+      responseFormatType: "html",
+      requestInfo: "https://example.com/search?q=%@keyWord&p=%@pageIndex",
+      list: "//li",
+      bookName: "//a/text()",
+      detailUrl: "//a/@href",
+    },
+    bookDetail: {
+      actionID: "bookDetail",
+      parserID: "DOM",
+      responseFormatType: "html",
+      requestInfo: "%@result",
+      title: "//h1/text()",
+      cover: "//img/@src",
+      desc: "//div[@class='intro']/text()",
+    },
+    chapterList: {
+      actionID: "chapterList",
+      parserID: "DOM",
+      responseFormatType: "html",
+      requestInfo: "%@result",
+      list: "//ul[@class='chapters']/li/a",
+      title: "//text()",
+      url: "//@href",
+    },
+    chapterContent: {
+      actionID: "chapterContent",
+      parserID: "DOM",
+      responseFormatType: "html",
+      requestInfo: "%@result",
+      content: "//div[@id='content']",
+    },
+  },
+}, null, 2)
