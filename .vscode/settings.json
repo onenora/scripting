@@ -1,0 +1,4 @@
+{
+  "js/ts.format.semicolons": "remove",
+  "js/ts.preferences.jsxAttributeCompletionStyle": "braces"
+}

@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+
+# Claude Code 技能（本地安装，不纳入仓库）
+.claude/skills/
