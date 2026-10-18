@@ -17,6 +17,7 @@ import {
 import { CapabilityLine, GITHUB_SYMBOL, GLASS, MODE_STYLE, ModeBadge, relativeTime, SettingRow } from "./glass-ui"
 import { hasGitHubToken, isBrowsingTokenOwner, readTokenInfo } from "./github-api"
 import { BrowseSwitcherPage } from "./browse-switcher-page"
+import { openReleaseDownloads } from "./repository-pages"
 import { OwnerProfileCard, type OwnerRelation } from "./repository-browser"
 import type { AccessMode, GitHubOwnerProfile, LoadState, TokenInfo } from "./types"
 
@@ -63,6 +64,7 @@ export function AccountPage({
           {mode !== "none" ? <BrowseManagement mode={mode} account={account} accountState={accountState} username={username} tokenInfo={tokenInfo} actions={actions} /> : null}
           <SectionTitle title="工具" />
           <SettingRow icon="link" title="GitHub Raw 链接转换" action={actions.onConvertRawLink} />
+          <SettingRow icon="folder" title="Release 下载文件夹" action={() => { void openReleaseDownloads() }} />
           {mode === "token" ? <TokenSecurityRow info={tokenInfo} failed={accountState === "error"} actions={actions} /> : null}
           <SectionTitle title="关于" />
           <AboutSection />

@@ -347,7 +347,8 @@ export function RepositoryReleasesPage({ repository }: { repository: RepositoryR
       await FileManager.createDirectory(directory, true)
       const data = await downloadReleaseAsset(asset)
       await FileManager.writeAsData(targetPath, data)
-      await Dialog.alert({ title: "下载完成", message: `${asset.name}\n版本：${release.tagName}\n已保存到下载文件夹。可从 Releases 右上角菜单快速打开。` })
+      const openFolder = await Dialog.confirm({ title: "下载完成", message: `${asset.name}\n版本：${release.tagName}\n已保存到下载文件夹，也可从 Releases 页顶部打开。`, confirmLabel: "打开下载文件夹", cancelLabel: "完成" })
+      if (openFolder) void openReleaseDownloads()
     } catch (caught) {
       await Dialog.alert({ title: "下载失败", message: caught instanceof Error ? caught.message : "Release 资产未能保存。" })
     } finally {
@@ -357,7 +358,7 @@ export function RepositoryReleasesPage({ repository }: { repository: RepositoryR
 
   useEffect(() => { void load() }, [repository.fullName])
 
-  return <PageBackground><List listStyle="inset" refreshable={async () => { invalidateRepositoryCache(repository.fullName); await load() }} scrollContentBackground="hidden" scrollEdgeEffectHidden={{ edges: "top", hidden: true }} listRowBackground={<></>} listRowSeparator="hidden" navigationTitle="Releases" navigationBarTitleDisplayMode="inline" toolbar={<Toolbar><ToolbarItem placement="cancellationAction"><Button title="关闭" action={dismiss} /></ToolbarItem><ToolbarItem placement="topBarTrailing"><Menu label={<Image systemName="folder" foregroundStyle="label" frame={{ minWidth: DESIGN.touch, minHeight: DESIGN.touch }} accessibilityLabel="Release 操作" />}><Button title="打开下载文件夹" systemImage="folder" action={() => { void Navigation.present(<NavigationStack><ReleaseDownloadsPage /></NavigationStack>) }} /><Button title="刷新 Releases" systemImage="arrow.clockwise" action={() => { void load() }} /></Menu></ToolbarItem></Toolbar>}><Section listRowBackground={<></>} listRowSeparator="hidden"><VStack spacing={12} frame={{ maxWidth: "infinity" }} listRowBackground={<></>} listRowSeparator="hidden"><HStack spacing={8} padding={{ horizontal: 14, vertical: 8 }} frame={{ maxWidth: "infinity", alignment: "leading" }} glassEffect={GLASS.content}><Image systemName="shippingbox.fill" font={18} foregroundStyle="systemBlue" frame={{ width: 42 }} /><VStack spacing={2} alignment="leading" frame={{ maxWidth: "infinity", alignment: "leading" }}><Text font={13} fontWeight="medium">{repository.fullName}</Text><Text font={12} foregroundStyle="secondaryLabel">{state === "loaded" ? `${releases.length} 个 Release` : "从 GitHub 读取版本发布"}</Text></VStack></HStack>{state === "loading" && releases.length === 0 ? <StatusSurface icon="shippingbox" title="正在读取 Releases" detail="正在从 GitHub 加载版本和可下载资产。" isLoading /> : null}{state === "error" ? <StatusSurface icon="exclamationmark.triangle.fill" title="无法读取 Releases" detail={errorStatusDetail(error)} action={() => { void load() }} /> : null}{state === "loaded" && releases.length === 0 ? <StatusSurface icon="shippingbox" title="没有 Release" detail="该仓库还没有发布版本。" /> : null}{releases.map(release => <ReleaseRow key={String(release.id)} release={release} downloadingAssetKey={downloadingAssetKey} onDownload={(asset) => { void downloadAsset(release, asset) }} />)}</VStack></Section></List></PageBackground>
+  return <PageBackground><List listStyle="inset" refreshable={async () => { invalidateRepositoryCache(repository.fullName); await load() }} scrollContentBackground="hidden" scrollEdgeEffectHidden={{ edges: "top", hidden: true }} listRowBackground={<></>} listRowSeparator="hidden" navigationTitle="Releases" navigationBarTitleDisplayMode="inline" toolbar={<Toolbar><ToolbarItem placement="cancellationAction"><Button title="关闭" action={dismiss} /></ToolbarItem><ToolbarItem placement="topBarTrailing"><Menu label={<Image systemName="folder" foregroundStyle="label" frame={{ minWidth: DESIGN.touch, minHeight: DESIGN.touch }} accessibilityLabel="Release 操作" />}><Button title="打开下载文件夹" systemImage="folder" action={() => { void openReleaseDownloads() }} /><Button title="刷新 Releases" systemImage="arrow.clockwise" action={() => { void load() }} /></Menu></ToolbarItem></Toolbar>}><Section listRowBackground={<></>} listRowSeparator="hidden"><VStack spacing={12} frame={{ maxWidth: "infinity" }} listRowBackground={<></>} listRowSeparator="hidden"><HStack spacing={8} padding={{ horizontal: 14, vertical: 8 }} frame={{ maxWidth: "infinity", alignment: "leading" }} glassEffect={GLASS.content}><Image systemName="shippingbox.fill" font={18} foregroundStyle="systemBlue" frame={{ width: 42 }} /><VStack spacing={2} alignment="leading" frame={{ maxWidth: "infinity", alignment: "leading" }}><Text font={13} fontWeight="medium">{repository.fullName}</Text><Text font={12} foregroundStyle="secondaryLabel">{state === "loaded" ? `${releases.length} 个 Release` : "从 GitHub 读取版本发布"}</Text></VStack></HStack>{state === "loading" && releases.length === 0 ? <StatusSurface icon="shippingbox" title="正在读取 Releases" detail="正在从 GitHub 加载版本和可下载资产。" isLoading /> : null}{state === "error" ? <StatusSurface icon="exclamationmark.triangle.fill" title="无法读取 Releases" detail={errorStatusDetail(error)} action={() => { void load() }} /> : null}{state === "loaded" && releases.length === 0 ? <StatusSurface icon="shippingbox" title="没有 Release" detail="该仓库还没有发布版本。" /> : null}{releases.map(release => <ReleaseRow key={String(release.id)} release={release} downloadingAssetKey={downloadingAssetKey} onDownload={(asset) => { void downloadAsset(release, asset) }} />)}</VStack></Section></List></PageBackground>
 }
 
 function ReleaseRow({ release, downloadingAssetKey, onDownload }: { release: GitHubRelease; downloadingAssetKey: string | null; onDownload: (asset: GitHubReleaseAsset) => void }) {
@@ -387,6 +388,11 @@ type ReleaseDownloadFile = {
   name: string
   size: number
   modifiedAt: number
+}
+
+/** Releases 页顶部、设置页工具、下载完成提示共用的下载文件夹入口。 */
+export async function openReleaseDownloads() {
+  await Navigation.present(<NavigationStack><ReleaseDownloadsPage /></NavigationStack>)
 }
 
 function ReleaseDownloadsPage() {

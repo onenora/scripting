@@ -4,6 +4,7 @@ import {
   Image,
   List,
   Section,
+  Spacer,
   Text,
   VStack,
   useEffect,
@@ -11,7 +12,7 @@ import {
 } from "scripting"
 import { readAccessMode, readCachedSearchRepositories, searchRepositories } from "./github-api"
 import { useFavorites } from "./favorites"
-import { errorStatusDetail, GLASS, IconButton, MODE_STYLE, ModeBadge, PageBackground, StatusSurface } from "./glass-ui"
+import { errorStatusDetail, GLASS, HeaderIconButton, MODE_STYLE, ModeBadge, PageBackground, StatusSurface } from "./glass-ui"
 import { RepositoryRow } from "./repository-browser"
 import type { AccessMode, GitHubRepository, LoadState } from "./types"
 
@@ -79,21 +80,31 @@ export function ExplorePage({ mode = readAccessMode(), onSubscriptionsChange }: 
 
 /** 顶部：标题与模式，下方为搜索入口（轻点弹出查询输入）与刷新。 */
 function ExploreHeader({ query, count, state, mode, onSearch, onRefresh }: { query: string; count: number; state: LoadState; mode: AccessMode; onSearch: () => void; onRefresh: () => void }) {
+  const title = (
+    <HStack spacing={8}>
+      <Image systemName="sparkles" font={15} foregroundStyle="systemBlue" />
+      <Text font={18} fontWeight="semibold">{query ? "搜索结果" : "热门开源仓库"}</Text>
+      <ModeBadge mode={mode} />
+    </HStack>
+  )
+  const searchField = (
+    <Button action={onSearch} buttonStyle="borderless" frame={{ maxWidth: "infinity", maxHeight: "infinity", alignment: "leading" }} padding={{ horizontal: 12 }} glassEffect={GLASS.interactiveCapsule} accessibilityLabel="搜索 GitHub 仓库">
+      <HStack spacing={8} frame={{ maxWidth: "infinity", alignment: "leading" }}>
+        <Image systemName="magnifyingglass" font={14} foregroundStyle="secondaryLabel" />
+        <Text font={14} foregroundStyle={query ? "label" : "tertiaryLabel"} lineLimit={1} frame={{ maxWidth: "infinity", alignment: "leading" }}>{query || "搜索仓库或 owner/repo"}</Text>
+      </HStack>
+    </Button>
+  )
   return (
     <VStack spacing={10} alignment="leading" padding={{ horizontal: 16, vertical: 14 }} frame={{ maxWidth: "infinity", alignment: "leading" }} glassEffect={GLASS.content}>
       <HStack spacing={8} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-        <Image systemName="sparkles" font={15} foregroundStyle="systemBlue" />
-        <Text font={18} fontWeight="semibold">{query ? "搜索结果" : "热门开源仓库"}</Text>
-        <ModeBadge mode={mode} />
+        {title}
+        <Spacer />
+        <HeaderIconButton icon="arrow.clockwise" label="刷新探索结果" action={onRefresh} />
       </HStack>
-      <HStack spacing={8} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-        <Button action={onSearch} buttonStyle="borderless" frame={{ maxWidth: "infinity", minHeight: 40, alignment: "leading" }} padding={{ horizontal: 12 }} glassEffect={GLASS.interactiveCapsule} accessibilityLabel="搜索 GitHub 仓库">
-          <HStack spacing={8} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-            <Image systemName="magnifyingglass" font={14} foregroundStyle="secondaryLabel" />
-            <Text font={14} foregroundStyle={query ? "label" : "tertiaryLabel"} lineLimit={1} frame={{ maxWidth: "infinity", alignment: "leading" }}>{query || "搜索仓库、owner/repo、language:swift"}</Text>
-          </HStack>
-        </Button>
-        <IconButton icon="arrow.clockwise" label="刷新探索结果" action={onRefresh} />
+      {/* 搜索框宽度取自标题行（隐藏副本），尾部与模式胶囊对齐。 */}
+      <HStack frame={{ minHeight: 40 }} overlay={searchField}>
+        <HStack opacity={0}>{title}</HStack>
       </HStack>
       <Text font={12} foregroundStyle="secondaryLabel">{state === "loaded" ? `${count} 个仓库 · 轻点可浏览、收藏或查看作者` : state === "idle" ? "尚未加载" : "加载中"}</Text>
     </VStack>

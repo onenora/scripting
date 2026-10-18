@@ -10,7 +10,7 @@
 - **Releases**：订阅仓库新版本，资产下载
 - **设置**：切换浏览用户（带浏览记录）、GitHub Token 管理、Raw 链接转换
 
-支持设为 Scripting 首页：在 App 设置中选择本脚本作为首页显示。
+支持设为 Scripting 首页：在 App 设置中选择本脚本，首页显示 Stars 列表。
 
 仓库内可浏览文件（预览 Markdown、代码、图片）、提交历史、Actions、Pull Request 与 Releases。
 

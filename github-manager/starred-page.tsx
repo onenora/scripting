@@ -66,7 +66,7 @@ type PresentationResult =
   | { type: "close-script" }
   | { type: "change-presentation-style"; style: PresentationStyle }
 
-/** homeScreen：作为 Scripting 首页标签显示，没有关闭与全面屏切换。 */
+/** homeScreen：作为 Scripting 首页标签显示，只有 Stars 列表。 */
 export default function StarredPage({ presentationStyle = "automatic", homeScreen = false }: { presentationStyle?: PresentationStyle; homeScreen?: boolean }) {
   const dismiss = Navigation.useDismiss()
   const favorites = useFavorites()
@@ -451,26 +451,33 @@ export default function StarredPage({ presentationStyle = "automatic", homeScree
     </Toolbar>
   )
 
+  // 首页标签已在 App 的标签栏中，只显示 Stars，避免嵌套出第二排标签栏。
+  if (homeScreen) {
+    return (
+      <ZStack frame={{ maxWidth: "infinity", maxHeight: "infinity" }}>
+        <PageBackground />
+        <NavigationStack>{repositoryList}</NavigationStack>
+      </ZStack>
+    )
+  }
+
   return (
     <ZStack frame={{ maxWidth: "infinity", maxHeight: "infinity" }}>
       <PageBackground />
       <NavigationStack>
         {/* iPhone 为底部标签栏；iPad / Mac 宽屏为可收起的侧边栏。 */}
-        <TabView tabViewStyle="sidebarAdaptable" toolbar={homeScreen ? undefined : tabToolbar}>
+        <TabView tabViewStyle="sidebarAdaptable" toolbar={tabToolbar}>
           <Tab title="探索" systemImage="sparkles" value="explore"><NavigationStack><ExplorePage mode={mode} onSubscriptionsChange={refreshSubscriptions} /></NavigationStack></Tab>
           <Tab title={favorites.length > 0 ? `收藏 (${favorites.length})` : "收藏"} systemImage="bookmark.fill" value="favorites"><NavigationStack><FavoritesPage onSubscriptionsChange={refreshSubscriptions} /></NavigationStack></Tab>
           <Tab title="Stars" systemImage="star.fill" value="stars"><NavigationStack>{repositoryList}</NavigationStack></Tab>
           <Tab title={unreadReleaseCount > 0 ? `Releases (${unreadReleaseCount})` : "Releases"} systemImage={unreadReleaseCount > 0 ? "bell.badge.fill" : "bell.fill"} value="releases"><NavigationStack><ReleaseTrackerPage onSubscriptionsChange={refreshSubscriptions} /></NavigationStack></Tab>
-          <Tab title="设置" systemImage="gearshape.fill" value="account">
-            <NavigationStack>
-              <AccountPage mode={mode} account={account} accountState={accountState} username={getGitHubUsername()} tokenInfo={tokenInfo} actions={accountActions} />
-            </NavigationStack>
-          </Tab>
+          <Tab title="设置" systemImage="gearshape.fill" value="account"><NavigationStack><AccountPage mode={mode} account={account} accountState={accountState} username={getGitHubUsername()} tokenInfo={tokenInfo} actions={accountActions} /></NavigationStack></Tab>
         </TabView>
       </NavigationStack>
     </ZStack>
   )
 }
+
 
 function formatSyncTime(iso: string): string {
   const d = new Date(iso)

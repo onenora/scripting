@@ -91,6 +91,15 @@ export function IconButton({
   )
 }
 
+/** 卡片标题行右上角的小图标按钮，样式与标题前的符号一致。 */
+export function HeaderIconButton({ icon, label, action, color = "systemBlue" }: { icon: string; label: string; action: () => void; color?: import("scripting").Color }) {
+  return (
+    <Button action={action} accessibilityLabel={label} buttonStyle="borderless" frame={{ minWidth: 32, minHeight: 32 }}>
+      <Image systemName={icon} font={15} fontWeight="semibold" foregroundStyle={color} />
+    </Button>
+  )
+}
+
 /** 两种读取方式使用不同的主色与图标，让用户一眼区分当前所处状态；两者都只读。 */
 export const MODE_STYLE: Record<AccessMode, { title: string; icon: string; color: import("scripting").Color }> = {
   token: { title: "授权浏览", icon: "checkmark.shield.fill", color: "systemGreen" },
