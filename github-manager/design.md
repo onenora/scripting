@@ -20,6 +20,8 @@ index.tsx
       └─ 设置      AccountPage
 ```
 
+`home_screen_default_ui.tsx` 把同一个 `StarredPage` 作为 Scripting 首页标签显示（`homeScreen` 模式，不显示关闭与全面屏切换），生命周期由 App 托管。
+
 `StarredPage` 持有全局状态（浏览方式、浏览对象资料、Star 列表、Token 元数据），通过 `AccountActions` 把操作交给设置页及其二级页。右上角按钮以 `dismiss({ type: "change-presentation-style" })` 让 `index.tsx` 以新样式重新呈现。
 
 ## 模块

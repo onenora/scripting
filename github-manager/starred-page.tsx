@@ -66,7 +66,8 @@ type PresentationResult =
   | { type: "close-script" }
   | { type: "change-presentation-style"; style: PresentationStyle }
 
-export default function StarredPage({ presentationStyle = "automatic" }: { presentationStyle?: PresentationStyle }) {
+/** homeScreen：作为 Scripting 首页标签显示，没有关闭与全面屏切换。 */
+export default function StarredPage({ presentationStyle = "automatic", homeScreen = false }: { presentationStyle?: PresentationStyle; homeScreen?: boolean }) {
   const dismiss = Navigation.useDismiss()
   const favorites = useFavorites()
   const [mode, setMode] = useState<AccessMode>(readAccessMode)
@@ -455,7 +456,7 @@ export default function StarredPage({ presentationStyle = "automatic" }: { prese
       <PageBackground />
       <NavigationStack>
         {/* iPhone 为底部标签栏；iPad / Mac 宽屏为可收起的侧边栏。 */}
-        <TabView tabViewStyle="sidebarAdaptable" toolbar={tabToolbar}>
+        <TabView tabViewStyle="sidebarAdaptable" toolbar={homeScreen ? undefined : tabToolbar}>
           <Tab title="探索" systemImage="sparkles" value="explore"><NavigationStack><ExplorePage mode={mode} onSubscriptionsChange={refreshSubscriptions} /></NavigationStack></Tab>
           <Tab title={favorites.length > 0 ? `收藏 (${favorites.length})` : "收藏"} systemImage="bookmark.fill" value="favorites"><NavigationStack><FavoritesPage onSubscriptionsChange={refreshSubscriptions} /></NavigationStack></Tab>
           <Tab title="Stars" systemImage="star.fill" value="stars"><NavigationStack>{repositoryList}</NavigationStack></Tab>
