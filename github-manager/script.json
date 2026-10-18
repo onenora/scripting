@@ -36,7 +36,10 @@
   "intentInputTypes" : [
 
   ],
-  "remoteResource" : null,
+  "remoteResource" : {
+    "autoUpdateInterval" : null,
+    "url" : "https:\/\/github.com\/onenora\/scripting\/github-manager"
+  },
   "description" : "只读 GitHub 浏览器：免 Token 公共浏览或 Token 授权浏览 Star 列表；探索热门开源仓库、查看作者主页、本地收藏与置顶；浏览仓库文件并预览 Markdown、代码与图片；查看提交历史、Actions、Pull Request 与 Release，支持资产下载与新版本订阅提醒；Raw 链接转换与全面屏显示切换。不会修改 GitHub 上任何内容。",
   "contributors" : [
 

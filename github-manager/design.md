@@ -78,6 +78,19 @@ index.tsx
 
 每次请求 100 个（与 20 个同样消耗 1 次额度），界面每批渲染 20 个。「加载更多」先展开本地数据，不足一批时才请求下一页；刷新只请求第一页。
 
+## 发布
+
+`script.json` 的 `remoteResource` 指向仓库子目录，App 据此从 GitHub 同步，字段顺序保持不变：
+
+```json
+"remoteResource" : {
+  "autoUpdateInterval" : null,
+  "url" : "https:\/\/github.com\/onenora\/scripting\/github-manager"
+},
+```
+
+只写 `url` 与 `autoUpdateInterval`；`hash` 由 App 内部生成，不提交。
+
 ## 界面约定
 
 - List 行内按钮使用 `borderless` / `plain`，避免整行成为点击区域。
