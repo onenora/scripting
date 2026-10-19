@@ -9,6 +9,7 @@
 | [GitHub Manager](github-manager/)   | 只读 GitHub 浏览器：Stars、探索、作者主页、本地收藏、Release 订阅与下载 |
 | [Fonts Installer](fonts-installer/) | 导入、预览字体并通过描述文件安装，支持可变字体单独字重                  |
 | [XBS Converter](xbs-converter/)     | 香色书源 XBS 与 JSON 互转：书源库管理、JSON 预览编辑、约束检查          |
+| [Script Store](script-store/)       | 社区脚本商店：搜索、排序、收藏、一键导入与发布                          |
 
 ## 安装
 
@@ -24,13 +25,15 @@ ower/
 │   ├── tsconfig.json   # 引用 ../scripting-dev/dts
 │   ├── github-manager/
 │   ├── fonts-installer/
-│   └── xbs-converter/
+│   ├── xbs-converter/
+│   └── script-store/
 └── scripting-dev/      # scripting-cli 工作区
     ├── dts/            # App 同步的类型声明
     └── scripts/
         ├── GitHub Manager -> ../../scripting/github-manager
         ├── Fonts Installer -> ../../scripting/fonts-installer
-        └── XBS Converter -> ../../scripting/xbs-converter
+        ├── XBS Converter -> ../../scripting/xbs-converter
+        └── Script Store -> ../../scripting/script-store
 ```
 
 - 实时同步：在 `scripting-dev` 中运行 `npx scripting-cli start --bonjour`，App 连接后保存即同步。
@@ -40,6 +43,7 @@ ower/
 ## 致谢
 
 - [BlackCCCat](https://github.com/BlackCCCat)：Fonts Installer 原作者。
+- [MolTau9527](https://github.com/MolTau9527)：脚本商店原作者。
 
 ## 约定
 

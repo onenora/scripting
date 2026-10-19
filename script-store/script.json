@@ -1,0 +1,43 @@
+{
+  "runInApp" : false,
+  "author" : {
+    "email" : null,
+    "homepage" : "https:\/\/github.com\/onenora\/scripting",
+    "name" : "onenora"
+  },
+  "localizedNames" : {
+    "fr" : "",
+    "zh" : "脚本商店",
+    "es" : "",
+    "ru" : "",
+    "en" : "",
+    "it" : "",
+    "ja" : "",
+    "de" : "",
+    "pt" : ""
+  },
+  "version" : "1.0.0",
+  "localizedDescriptions" : {
+    "fr" : "",
+    "zh" : "",
+    "es" : "",
+    "ru" : "",
+    "en" : "",
+    "it" : "",
+    "ja" : "",
+    "de" : "",
+    "pt" : ""
+  },
+  "permissions" : null,
+  "iconImage" : null,
+  "name" : "Script Store",
+  "entry" : "index.tsx",
+  "icon" : "bag",
+  "color" : "rgba(255, 149, 0, 1.00)",
+  "remoteResource" : {
+    "autoUpdateInterval" : null,
+    "url" : "https:\/\/github.com\/onenora\/scripting\/script-store"
+  },
+  "description" : "浏览并一键安装社区 Scripting 脚本：搜索、排序、收藏、作者作品页与脚本发布。数据来自第三方站点 scripting.roayc.com。",
+  "contributors" : []
+}
