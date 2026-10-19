@@ -26,6 +26,7 @@ index.tsx
 | `store-api.ts` | 站点接口：脚本列表、站点公告、发布；字段清洗、作者解析、日期格式 |
 | `install.ts` | 导入链接包装、打开 Scripting 导入、发布链接校验 |
 | `favorites.ts` | 收藏 ID 存储与跨页同步 Hook、发布作者名 |
+| `store-cache.ts` | 商店列表快照的读写 |
 | `ui-font.ts` | 界面字体：PostScript 名称存储、`useUIFont` 订阅 Hook、FontPicker 选择 |
 | `glass-ui.tsx` | 通用组件：`SectionTitle`、`StatusSurface`、`CapsuleButton`、`GetButton`、`ScriptIcon`、`Tag`、`FootNote` 等 |
 | `store-page.tsx` | 主页：加载、搜索、热门、收藏分组、显示选项（排序 / 字体） |
@@ -51,12 +52,14 @@ index.tsx
 | 数据 | 位置 |
 |---|---|
 | 收藏 `script-store.favorites`（脚本 ID 数组） | 脚本私有 Storage |
+| 列表快照 `script-store.cache`：脚本列表、公告、保存时间；每次刷新成功整体覆盖，只保留一份 | 脚本私有 Storage |
 | 发布作者名 `script-store.author` | 脚本私有 Storage |
 | 界面字体 `script-store.ui-font`（PostScript 名称） | 脚本私有 Storage |
 
 ## 页面
 
 - 主页：导航栏中间显示脚本名 Script Store（使用界面字体）；首张卡片上为站点声明 `bannerSubtitle`，下为插件数量「可见数 / 总数」；`warningMessage` 放在全部脚本分组末尾。搜索时隐藏热门与收藏。
+- 加载：有快照时打开即显示、不发请求，信息卡显示「更新于 … · 下拉刷新」；无快照时自动加载。刷新失败保留当前列表并提示，公告接口失败时沿用上一份公告。
 - 工具栏：左侧关闭，右侧「显示选项」菜单（排序 + 界面字体）与发布；详情页右侧为收藏与「更多」菜单。
 - 详情页参照 App Store：104pt 图标 + 名称 + 作者 + 获取按钮，下方「安装 / 更新 / 来源」信息条；点作者进入作品页。
 - 发布前 `Dialog.confirm` 提示将公开提交，提交中禁止下滑关闭。

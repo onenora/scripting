@@ -4,6 +4,7 @@ import { ACCENT, CapsuleButton, FootNote, GLASS, ScriptIcon, SectionTitle, Statu
 import { presentPublish } from "./publish-page"
 import { ScriptCard, ScriptDetailPage } from "./script-detail-page"
 import { fetchNotice, fetchScripts, type SiteNotice, type StoreScript } from "./store-api"
+import { formatSavedAt, readSnapshot, saveSnapshot } from "./store-cache"
 import { currentFontName, pickFont, setFontName, useUIFont } from "./ui-font"
 
 type SortKey = "latest" | "popular" | "name"
@@ -38,8 +39,8 @@ function PopularTile({ item, onOpen }: { item: StoreScript; onOpen: () => void }
   )
 }
 
-/** 主页首张卡片：站点声明 + 插件数量，与下方卡片同宽，顶部留出与导航栏的间距。 */
-function NoticeCard({ text, count }: { text: string; count: string }) {
+/** 主页首张卡片：站点声明 + 插件数量与更新时间，与下方卡片同宽，顶部留出与导航栏的间距。 */
+function NoticeCard({ text, count, updated }: { text: string; count: string; updated?: string }) {
   const font = useUIFont()
   return (
     <VStack spacing={12} padding={{ horizontal: 16, vertical: 14 }} frame={{ maxWidth: "infinity", alignment: "leading" }} glassEffect={GLASS.content} listRowBackground={<></>} listRowSeparator="hidden" listRowInsets={{ top: 16, leading: 20, bottom: 4, trailing: 20 }}>
@@ -50,7 +51,10 @@ function NoticeCard({ text, count }: { text: string; count: string }) {
       <Divider />
       <HStack spacing={10}>
         <Image systemName="shippingbox" font={15} fontWeight="semibold" foregroundStyle={ACCENT} frame={{ width: 20 }} />
-        <Text font={font(15)} foregroundStyle="label">插件</Text>
+        <VStack spacing={2} alignment="leading">
+          <Text font={font(15)} foregroundStyle="label">插件</Text>
+          {updated ? <Text font={font(11)} foregroundStyle="tertiaryLabel">{updated}</Text> : null}
+        </VStack>
         <Spacer />
         <Text font={font(15)} fontWeight="semibold" foregroundStyle="secondaryLabel">{count}</Text>
       </HStack>
@@ -58,15 +62,17 @@ function NoticeCard({ text, count }: { text: string; count: string }) {
   )
 }
 
-/** 商店主页：大标题 + 数量副标题，热门、收藏与全部脚本；卡片点按进入详情。 */
+/** 商店主页：信息卡、热门、收藏与全部脚本；卡片点按进入详情。有快照时直接显示，下拉刷新。 */
 export function StorePage() {
   const dismiss = Navigation.useDismiss()
   const favorites = useFavorites()
   const font = useUIFont()
   const fontName = currentFontName()
-  const [scripts, setScripts] = useState<StoreScript[]>([])
-  const [notice, setNotice] = useState<SiteNotice | null>(null)
-  const [state, setState] = useState<"loading" | "loaded" | "error">("loading")
+  const [snapshot] = useState(readSnapshot)
+  const [scripts, setScripts] = useState<StoreScript[]>(snapshot?.scripts ?? [])
+  const [notice, setNotice] = useState<SiteNotice | null>(snapshot?.notice ?? null)
+  const [savedAt, setSavedAt] = useState(snapshot?.savedAt ?? 0)
+  const [state, setState] = useState<"loading" | "loaded" | "error">(snapshot ? "loaded" : "loading")
   const [error, setError] = useState("")
   const [query, setQuery] = useState("")
   const [sort, setSort] = useState<SortKey>("latest")
@@ -74,19 +80,29 @@ export function StorePage() {
   const selected = scripts.find(item => item.id === selectedId)
 
   async function load() {
-    setState("loading")
+    // 已有列表时刷新不清空界面，失败也保留当前数据。
+    const hasData = scripts.length > 0
+    if (!hasData) setState("loading")
     try {
       const [items, site] = await Promise.all([fetchScripts(), fetchNotice()])
+      // 公告接口失败时返回空值，沿用上一份公告。
+      const nextNotice = site.subtitle || site.warning ? site : notice ?? site
       setScripts(items)
-      setNotice(site)
+      setNotice(nextNotice)
+      setSavedAt(saveSnapshot(items, nextNotice).savedAt)
       setState("loaded")
     } catch (err) {
+      if (hasData) {
+        await Dialog.alert({ title: "刷新失败", message: `${errorMessage(err)}\n当前显示的是上次保存的列表。` })
+        return
+      }
       setError(errorMessage(err))
       setState("error")
     }
   }
 
-  useEffect(() => { void load() }, [])
+  // 没有快照时才自动加载；有快照直接显示，下拉刷新。
+  useEffect(() => { if (!snapshot) void load() }, [])
 
   const visible = useMemo(() => {
     const keyword = query.trim().toLowerCase()
@@ -158,7 +174,11 @@ export function StorePage() {
         }}
       >
         <Section listRowBackground={<></>} listRowSeparator="hidden">
-          <NoticeCard text={notice?.subtitle || DEFAULT_NOTICE} count={state === "loaded" ? `${visible.length} / ${scripts.length}` : "加载中"} />
+          <NoticeCard
+            text={notice?.subtitle || DEFAULT_NOTICE}
+            count={state === "loaded" ? `${visible.length} / ${scripts.length}` : "加载中"}
+            updated={savedAt ? `更新于 ${formatSavedAt(savedAt)} · 下拉刷新` : undefined}
+          />
         </Section>
 
         {browsing && popular.length ? (
