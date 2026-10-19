@@ -85,8 +85,9 @@ index.tsx
 ```json
 "remoteResource" : {
   "autoUpdateInterval" : null,
+  "hash" : "",
   "url" : "https:\/\/github.com\/onenora\/scripting\/github-manager"
 },
 ```
 
-只写 `url` 与 `autoUpdateInterval`；`hash` 由 App 内部生成，不提交。
+`hash` 必须存在：缺少时 App 不识别远程链接，长按显示为空。实际值由 App 维护，仓库保持空字符串。

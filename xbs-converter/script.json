@@ -39,6 +39,7 @@
   ],
   "remoteResource" : {
     "autoUpdateInterval" : null,
+    "hash" : "",
     "url" : "https:\/\/github.com\/onenora\/scripting\/xbs-converter"
   },
   "description" : "香色闺阁书源 XBS 与 JSON 互相转换：导入管理书源库，预览与编辑 JSON，按 StandarReader 2.56.1 硬约束检查，导出 XBS / JSON。",

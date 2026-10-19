@@ -54,4 +54,4 @@ fonttools 缺失时先确认并执行 `pip install fonttools`，失败则提示�
 
 ## 发布
 
-`script.json` 的 `remoteResource` 指向仓库子目录，只写 `url` 与 `autoUpdateInterval`，`hash` 由 App 生成，不提交。
+`script.json` 的 `remoteResource` 指向仓库子目录，写 `url`、`autoUpdateInterval` 与空的 `hash`（缺少 `hash` 时 App 不识别远程链接，长按显示为空）；`hash` 的实际值由 App 维护，仓库保持空字符串。
