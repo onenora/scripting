@@ -48,14 +48,9 @@ fonttools 缺失时先确认并执行 `pip install fonttools`，失败则提示�
 | 界面字体 `fonts-installer.ui-font`（PostScript 名称） | 脚本私有 Storage |
 | 预览、实例化临时文件 | 临时目录，用完即删 |
 
-## 界面约定
+## 页面
 
-- 与 GitHub Manager 一致：系统分组背景 + 透明玻璃卡片，颜色使用系统语义色，主色 `systemIndigo`。
-- 分组第一行为 `SectionTitle`（图标 + 标题 + 状态，左对齐），右侧放操作图标；空状态卡片自带主操作时，标题行不重复放同一入口。
-- 需要左滑的卡片各自成为一行（`trailingSwipeActions`），用 `listRowInsets` 控制卡片间距；List 行内按钮使用 `borderless`。
-- 分组说明用 `FootNote` 作为最后一行，不用 Section `footer`（最后一组的 footer 会悬浮在底部）。
-- 界面文字统一通过 `uiFont(size)` 取字体：历史左滑「应用」后整页改用该字体，「还原」恢复系统字体；字体预览页始终显示被预览的字体。导航栏标题与左滑按钮由系统绘制，不受影响。
-- SF Symbol `textformat` 系列在中文环境会本地化成汉字，界面内字体图标用 `f.cursive`。
+- 历史左滑「应用」后整页改用该字体，「还原」恢复系统字体；字体预览页始终显示被预览的字体。
 
 ## 发布
 

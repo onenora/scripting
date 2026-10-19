@@ -90,9 +90,3 @@ index.tsx
 ```
 
 只写 `url` 与 `autoUpdateInterval`；`hash` 由 App 内部生成，不提交。
-
-## 界面约定
-
-- List 行内按钮使用 `borderless` / `plain`，避免整行成为点击区域。
-- 组件属性避开 `badge` 等通用视图属性名。
-- 状态统一用 `StatusSurface`：加载中、空、错误各自给出可执行动作。

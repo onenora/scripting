@@ -82,11 +82,9 @@ intent.tsx
 | 书源库索引 `library.json`、书源 `<id>.json` | `FileManager.appGroupDocumentsDirectory/xbs-converter/` |
 | 导出密码 `xbs-converter.export-password` | 钥匙串（不同步 iCloud） |
 
-## 界面约定
+## 页面
 
-- 与 GitHub Manager / Fonts Installer 一致：系统分组背景 + 透明玻璃卡片，颜色使用系统语义色，主色 `systemTeal`。
-- 分组第一行为 `SectionTitle`；空状态卡片自带导入按钮，有内容后右上角 + 菜单提供导入、粘贴、新建。
-- 需要左滑的卡片各自成为一行（`CARD_ROW` 的 `listRowInsets`）；分组说明用 `FootNote` 作为最后一行。
+- 空状态卡片自带导入按钮；有内容后右上角 + 菜单提供导入、粘贴、新建。
 - 状态标签：绿色「检查通过」、橙色「N 项提示」、红色「JSON 无效」（无效时禁用导出）。
 
 ## 发布
