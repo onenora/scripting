@@ -411,7 +411,7 @@ export default function StarredPage({ presentationStyle = "automatic", homeScree
           )}
           {mode === "public" && state === "idle" ? <StatusSurface icon="icloud.and.arrow.down" iconForegroundStyle={modeStyle.color} title="尚未加载" detail="公共浏览不会自动请求 GitHub。点击加载或下拉刷新读取该用户的公开 Star，结果会缓存到本机。" action={() => { void loadRepositories(true) }} actionTitle="加载 Star" actionSystemImage="arrow.down.circle" /> : null}
           {browsingSelf && accountState === "error" ? <StatusSurface icon="exclamationmark.shield.fill" iconForegroundStyle="systemOrange" title="Token 验证失败" detail="Token 可能已过期或被撤销，请重新验证或更换。" action={accountActions.onConfigureToken} actionTitle="更换 Token" actionSystemImage="key.horizontal" /> : null}
-          {state === "loading" && repositories.length === 0 ? <StatusSurface icon="arrow.triangle.2.circlepath" iconForegroundStyle={modeStyle.color} title="正在更新" detail="正在读取最近 Star 的仓库。" isLoading /> : null}
+          {state === "loading" && repositories.length === 0 ? <StatusSurface icon="arrow.triangle.2.circlepath" iconForegroundStyle={modeStyle.color} title="正在更新" detail="正在读取最近 Star 的仓库。" loading /> : null}
           {state === "error" ? <StatusSurface icon="exclamationmark.triangle.fill" title="更新失败" detail={errorStatusDetail(error, isTokenMode ? "请检查网络连接或 Token 是否有效后重试。" : "请检查用户名是否正确、网络是否可用；若提示限额，请稍后再试或添加 Token。")} action={() => { void loadRepositories() }} /> : null}
           {state === "loaded" && repositories.length === 0 ? <StatusSurface icon="star.slash" title="还没有已加星的仓库" detail={browsingSelf ? "你的账户还没有 Star 任何仓库，可以去探索页看看。" : "该用户没有公开的 Star 仓库。"} /> : null}
           {pinnedRepositories.map(repository => renderRow(repository, true))}

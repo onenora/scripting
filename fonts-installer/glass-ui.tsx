@@ -3,14 +3,14 @@ import {
   HStack,
   Image,
   ProgressView,
-  Rectangle,
   Spacer,
   Text,
   VStack,
   type Color,
 } from "scripting"
+import { useUIFont } from "./ui-font"
 
-// 与 GitHub Manager 一致：透明玻璃 + 系统分组背景，颜色全部使用系统语义色。
+// 各脚本共用的标准组件（见 STYLE.md），按需裁剪：透明玻璃 + 系统分组背景，颜色全部使用系统语义色。
 const contentGlass = UIGlass.clear().interactive(false)
 const controlGlass = UIGlass.clear().interactive(true)
 
@@ -23,30 +23,15 @@ export const GLASS = {
 
 export const ACCENT: Color = "systemIndigo"
 
-const UI_FONT_KEY = "fonts-installer.ui-font"
-let uiFontName: string | null = Storage.get<string>(UI_FONT_KEY) ?? null
-
-export function readUIFont(): string | null {
-  return uiFontName
-}
-
-export function saveUIFont(name: string | null) {
-  uiFontName = name
-  if (name) Storage.set(UI_FONT_KEY, name)
-  else Storage.remove(UI_FONT_KEY)
-}
-
-/** 界面文字字体：应用了已安装字体时使用该字体，否则为系统字体。字体预览页不使用。 */
-export function uiFont(size: number): number | { name: string; size: number } {
-  return uiFontName ? { name: uiFontName, size } : size
+/** 卡片行：各自成为一行才能左滑，间距由 listRowInsets 控制。 */
+export const CARD_ROW = {
+  listRowBackground: <></>,
+  listRowSeparator: "hidden" as const,
+  listRowInsets: { top: 4, leading: 20, bottom: 4, trailing: 20 },
 }
 
 export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
-}
-
-export function PageBackground() {
-  return <Rectangle fill="systemGroupedBackground" ignoresSafeArea={true} allowsHitTesting={false} />
 }
 
 /** 分组标题行：图标、标题、简短状态左对齐，右侧放操作按钮。 */
@@ -56,11 +41,12 @@ export function SectionTitle({ icon, title, detail, action }: {
   detail?: string
   action?: JSX.Element
 }) {
+  const font = useUIFont()
   return (
     <HStack spacing={8} padding={{ horizontal: 4, top: 4 }} frame={{ maxWidth: "infinity", minHeight: 32, alignment: "leading" }} listRowBackground={<></>} listRowSeparator="hidden">
       <Image systemName={icon} font={15} fontWeight="semibold" foregroundStyle={ACCENT} frame={{ width: 20 }} />
-      <Text font={uiFont(17)} fontWeight="semibold" foregroundStyle="label">{title}</Text>
-      {detail ? <Text font={uiFont(12)} foregroundStyle="secondaryLabel" lineLimit={1}>{detail}</Text> : null}
+      <Text font={font(17)} fontWeight="semibold" foregroundStyle="label">{title}</Text>
+      {detail ? <Text font={font(12)} foregroundStyle="secondaryLabel" lineLimit={1}>{detail}</Text> : null}
       <Spacer />
       {action ?? <Spacer frame={{ width: 32, height: 32 }} />}
     </HStack>
@@ -84,23 +70,32 @@ export function HeaderIconButton({ icon, label, action, color = ACCENT, busy = f
   )
 }
 
-export function Tag({ text, color = ACCENT }: { text: string; color?: Color }) {
-  return <Text font={uiFont(11)} fontWeight="semibold" foregroundStyle={color} padding={{ horizontal: 8, vertical: 3 }} glassEffect={GLASS.capsule}>{text}</Text>
+export function Tag({ text, color = ACCENT, icon }: { text: string; color?: Color; icon?: string }) {
+  const font = useUIFont()
+  return (
+    <HStack spacing={3} padding={{ horizontal: 8, vertical: 3 }} glassEffect={GLASS.capsule}>
+      {icon ? <Image systemName={icon} font={10} fontWeight="semibold" foregroundStyle={color} /> : null}
+      <Text font={font(11)} fontWeight="semibold" foregroundStyle={color} lineLimit={1}>{text}</Text>
+    </HStack>
+  )
 }
 
-export function CapsuleButton({ title, icon, action, prominent = false, disabled = false }: {
+/** `color` 覆盖文字与图标颜色（如危险操作用 systemRed），默认 `prominent` 用主色、否则用 label。 */
+export function CapsuleButton({ title, icon, action, prominent = false, disabled = false, color }: {
   title: string
   icon: string
   action: () => void
   prominent?: boolean
   disabled?: boolean
+  color?: Color
 }) {
-  const color: Color = prominent ? ACCENT : "label"
+  const font = useUIFont()
+  const tint: Color = color ?? (prominent ? ACCENT : "label")
   return (
     <Button action={action} disabled={disabled} accessibilityLabel={title} buttonStyle="borderless" padding={{ horizontal: 14, vertical: 9 }} glassEffect={GLASS.interactiveCapsule}>
       <HStack spacing={6}>
-        <Image systemName={icon} font={13} fontWeight="semibold" foregroundStyle={color} />
-        <Text font={uiFont(14)} fontWeight={prominent ? "semibold" : "medium"} foregroundStyle={color}>{title}</Text>
+        <Image systemName={icon} font={13} fontWeight="semibold" foregroundStyle={tint} />
+        <Text font={font(14)} fontWeight={prominent ? "semibold" : "medium"} foregroundStyle={tint}>{title}</Text>
       </HStack>
     </Button>
   )
@@ -112,10 +107,11 @@ export function DetailRow({ label, value, onCopy, disabled = false }: {
   onCopy?: () => void
   disabled?: boolean
 }) {
+  const font = useUIFont()
   return (
     <HStack spacing={10} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-      <Text font={uiFont(13)} foregroundStyle="secondaryLabel" frame={{ width: 76, alignment: "leading" }}>{label}</Text>
-      <Text font={uiFont(13)} foregroundStyle="label" lineLimit={1} truncationMode="tail" frame={{ maxWidth: "infinity", alignment: "leading" }}>{value}</Text>
+      <Text font={font(13)} foregroundStyle="secondaryLabel" frame={{ width: 76, alignment: "leading" }}>{label}</Text>
+      <Text font={font(13)} foregroundStyle="label" lineLimit={1} truncationMode="tail" frame={{ maxWidth: "infinity", alignment: "leading" }}>{value}</Text>
       {onCopy ? (
         <Button action={onCopy} disabled={disabled} accessibilityLabel={`复制${label}`} buttonStyle="borderless" frame={{ minWidth: 28, minHeight: 28 }}>
           <Image systemName="doc.on.doc" font={13} foregroundStyle={ACCENT} />
@@ -126,24 +122,27 @@ export function DetailRow({ label, value, onCopy, disabled = false }: {
 }
 
 export function FootNote({ children }: { children: string }) {
-  return <Text font={uiFont(12)} foregroundStyle="secondaryLabel" multilineTextAlignment="leading" fixedSize={{ horizontal: false, vertical: true }} padding={{ horizontal: 4 }} frame={{ maxWidth: "infinity", alignment: "leading" }} listRowBackground={<></>} listRowSeparator="hidden">{children}</Text>
+  const font = useUIFont()
+  return <Text font={font(12)} foregroundStyle="secondaryLabel" multilineTextAlignment="leading" fixedSize={{ horizontal: false, vertical: true }} padding={{ horizontal: 4 }} frame={{ maxWidth: "infinity", alignment: "leading" }} listRowBackground={<></>} listRowSeparator="hidden">{children}</Text>
 }
 
-export function StatusSurface({ icon, title, detail, action, actionTitle, actionSystemImage = "plus", iconForegroundStyle = ACCENT }: {
+/** 加载 / 空 / 错误三态卡片；`loading` 时图标换成进度圈。 */
+export function StatusSurface({ icon, title, detail, loading = false, iconForegroundStyle = ACCENT, children }: {
   icon: string
   title: string
   detail: string
-  action?: () => void
-  actionTitle?: string
-  actionSystemImage?: string
+  loading?: boolean
   iconForegroundStyle?: Color
+  /** 底部操作按钮，横向排列。 */
+  children?: JSX.Element | JSX.Element[]
 }) {
+  const font = useUIFont()
   return (
     <VStack spacing={10} alignment="center" padding={24} frame={{ maxWidth: "infinity" }} glassEffect={GLASS.content} listRowBackground={<></>} listRowSeparator="hidden">
-      <Image systemName={icon} font={28} fontWeight="semibold" foregroundStyle={iconForegroundStyle} />
-      <Text font={uiFont(17)} fontWeight="semibold" foregroundStyle="label">{title}</Text>
-      <Text font={uiFont(13)} foregroundStyle="secondaryLabel" multilineTextAlignment="center">{detail}</Text>
-      {action && actionTitle ? <CapsuleButton title={actionTitle} icon={actionSystemImage} action={action} prominent /> : null}
+      {loading ? <ProgressView progressViewStyle="circular" /> : <Image systemName={icon} font={28} fontWeight="semibold" foregroundStyle={iconForegroundStyle} />}
+      <Text font={font(17)} fontWeight="semibold" foregroundStyle="label">{title}</Text>
+      <Text font={font(13)} foregroundStyle="secondaryLabel" multilineTextAlignment="center">{detail}</Text>
+      {children ? <HStack spacing={10} padding={{ top: 4 }}>{children}</HStack> : null}
     </VStack>
   )
 }

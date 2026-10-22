@@ -1,5 +1,5 @@
 import { Button, HStack, Image, List, Navigation, NavigationStack, SecureField, Section, Text, TextField, VStack, useState } from "scripting"
-import { ACCENT, CARD_ROW, FootNote, GLASS, SectionTitle, Tag } from "./glass-ui"
+import { ACCENT, AboutCard, AboutLine, CARD_ROW, FootNote, GLASS, SectionTitle, Tag } from "./glass-ui"
 
 /** 设置：导出 XBS 的书源密码。完成时 `dismiss(password)`，取消返回 undefined。 */
 function SettingsPage({ initialPassword }: { initialPassword: string }) {
@@ -45,6 +45,15 @@ function SettingsPage({ initialPassword }: { initialPassword: string }) {
             ) : null}
           </VStack>
           <FootNote>设置后，导出 XBS 时为每个书源写入 password 字段（覆盖已有值），在香色闺阁中查看或编辑书源需输入该密码。书源库与 JSON 导出保持原样。这只是弱保护：XBS 可被解密读取。密码保存在钥匙串中。</FootNote>
+        </Section>
+
+        <Section listRowBackground={<></>} listRowSeparator="hidden">
+          <SectionTitle icon="info.circle" title="关于" />
+          <AboutCard>
+            <AboutLine icon="arrow.left.arrow.right" title="XBS ⇄ JSON" detail="香色闺阁书源 XBS 与 JSON 互转，书源库保存格式化后的 JSON，导出时再编码。" />
+            <AboutLine icon="checklist" title="约束检查" detail="按香色闺阁的字段约束逐项检查，标「可修复」的问题可一键修复。" />
+            <AboutLine icon="lock" title="本机保存" detail="书源库只存在本机，导出密码存钥匙串、不同步 iCloud。" />
+          </AboutCard>
         </Section>
       </List>
     </NavigationStack>

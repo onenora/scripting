@@ -16,7 +16,7 @@ import {
   useState,
 } from "scripting"
 import { fetchOwnerProfile, fetchOwnerRepositories } from "./github-api"
-import { compactNumber, DESIGN, errorStatusDetail, GITHUB_SYMBOL, GLASS, openGitHubWebPage, relativeTime, RepositoryIcon, RepositoryMetadata, StatusSurface } from "./glass-ui"
+import { ACCENT, compactNumber, DESIGN, errorStatusDetail, GITHUB_SYMBOL, GLASS, openGitHubWebPage, relativeTime, RepositoryIcon, RepositoryMetadata, StatusSurface } from "./glass-ui"
 import { toggleFavorite, useFavorites } from "./favorites"
 import { isSubscribedToReleases, toggleReleaseSubscription } from "./release-tracker"
 import { openRepositoryFiles, openRepositoryReleases } from "./repository-pages"
@@ -76,13 +76,13 @@ export function RepositoryRow({
             </HStack>
             <Text font={13} foregroundStyle="secondaryLabel" frame={{ maxWidth: "infinity", alignment: "leading" }} multilineTextAlignment="leading" fixedSize={{ horizontal: false, vertical: true }}>{repository.description ?? "暂无描述"}</Text>
             <HStack spacing={8} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-              <RepositoryMetadata icon={GITHUB_SYMBOL} value={repository.language ?? "未标注"} color="systemBlue" />
+              <RepositoryMetadata icon={GITHUB_SYMBOL} value={repository.language ?? "未标注"} color={ACCENT} />
               <RepositoryMetadata icon="star.fill" value={compactNumber(repository.stargazersCount)} color="systemOrange" />
               <RepositoryMetadata icon="arrow.triangle.branch" value={compactNumber(repository.forksCount)} color="systemPurple" />
               <RepositoryMetadata icon="clock" value={relativeTime(repository.pushedAt ?? repository.updatedAt)} />
             </HStack>
           </VStack>
-          <Image systemName={pinned ? "pin.fill" : "ellipsis"} font={pinned ? 14 : 13} fontWeight="semibold" foregroundStyle={pinned ? "systemBlue" : "tertiaryLabel"} frame={{ minWidth: 20, maxHeight: "infinity" }} />
+          <Image systemName={pinned ? "pin.fill" : "ellipsis"} font={pinned ? 14 : 13} fontWeight="semibold" foregroundStyle={pinned ? ACCENT : "tertiaryLabel"} frame={{ minWidth: 20, maxHeight: "infinity" }} />
         </HStack>
       }
     >
@@ -154,7 +154,7 @@ export function OwnerPage({ login, showProfile = true }: { login: string; showPr
       searchToolbarBehavior="minimize"
       toolbar={
         <Toolbar>
-          <ToolbarItem placement="cancellationAction"><Button title="关闭" action={dismiss} /></ToolbarItem>
+          <ToolbarItem placement="cancellationAction"><Button title="关闭" systemImage="xmark" action={dismiss} /></ToolbarItem>
           <ToolbarItem placement="topBarTrailing">
             <Menu label={<Image systemName="ellipsis.circle" foregroundStyle="label" frame={{ minWidth: 44, minHeight: 44 }} />}>
               <Button title="在 GitHub 客户端中打开" systemImage={GITHUB_SYMBOL} action={() => { void Safari.openURL(`github://github.com/${encodeURIComponent(login)}`) }} />
@@ -168,13 +168,13 @@ export function OwnerPage({ login, showProfile = true }: { login: string; showPr
       <Section listRowBackground={<></>} listRowSeparator="hidden">
         <VStack spacing={12} frame={{ maxWidth: "infinity" }} listRowBackground={<></>} listRowSeparator="hidden">
           {showProfile && profile ? <OwnerProfileCard profile={profile} /> : null}
-          {state === "loading" && !profile ? <StatusSurface icon="person.crop.circle" title="正在读取作者主页" detail={`正在读取 @${login} 的资料与公开仓库。`} isLoading /> : null}
+          {state === "loading" && !profile ? <StatusSurface icon="person.crop.circle" title="正在读取作者主页" detail={`正在读取 @${login} 的资料与公开仓库。`} loading /> : null}
           {state === "error" ? <StatusSurface icon="exclamationmark.triangle.fill" title="无法读取作者主页" detail={errorStatusDetail(error, "请检查网络后重试；公共浏览每小时限 60 次请求。")} action={() => { void load(true) }} /> : null}
           {state === "loaded" || repositories.length > 0 ? (
             <HStack spacing={8} padding={{ horizontal: 8, vertical: 2 }} frame={{ maxWidth: "infinity", alignment: "leading" }}>
               <Text font={13} fontWeight="semibold" foregroundStyle="secondaryLabel">{`公开仓库 · ${visibleRepositories.length}${profile && profile.publicRepos > repositories.length ? ` / ${profile.publicRepos}` : ""}`}</Text>
               <Spacer />
-              <Menu label={<Text font={12} fontWeight="medium" foregroundStyle="systemBlue">排序：{OWNER_SORT_TITLE[sort]}</Text>}>
+              <Menu label={<Text font={12} fontWeight="medium" foregroundStyle={ACCENT}>排序：{OWNER_SORT_TITLE[sort]}</Text>}>
                 {(Object.keys(OWNER_SORT_TITLE) as OwnerSort[]).map(candidate => <Button key={candidate} title={OWNER_SORT_TITLE[candidate]} systemImage={candidate === sort ? "checkmark" : "arrow.up.arrow.down"} action={() => setSort(candidate)} />)}
               </Menu>
             </HStack>
@@ -210,15 +210,15 @@ export function OwnerProfileCard({ profile, onOpenRepositories, onOpenProfile, r
           {onOpenProfile ? (
             <Button action={onOpenProfile} buttonStyle="borderless" accessibilityLabel={`打开 @${profile.login} 的主页`}>
               <HStack spacing={3}>
-                <Text font={13} fontWeight="medium" foregroundStyle="systemBlue">@{profile.login}</Text>
-                <Image systemName="chevron.right" font={10} fontWeight="semibold" foregroundStyle="systemBlue" />
+                <Text font={13} fontWeight="medium" foregroundStyle={ACCENT}>@{profile.login}</Text>
+                <Image systemName="chevron.right" font={10} fontWeight="semibold" foregroundStyle={ACCENT} />
               </HStack>
             </Button>
           ) : <Text font={13} foregroundStyle="secondaryLabel">@{profile.login}</Text>}
           <HStack spacing={6}>
             <HStack spacing={4} padding={{ horizontal: 9, vertical: 4 }} glassEffect={GLASS.capsule}>
-              <Image systemName={isOrganization ? "building.2.fill" : "person.fill"} font={11} fontWeight="semibold" foregroundStyle="systemBlue" />
-              <Text font={12} fontWeight="semibold" foregroundStyle="systemBlue">{typeLabel}</Text>
+              <Image systemName={isOrganization ? "building.2.fill" : "person.fill"} font={11} fontWeight="semibold" foregroundStyle={ACCENT} />
+              <Text font={12} fontWeight="semibold" foregroundStyle={ACCENT}>{typeLabel}</Text>
             </HStack>
             {trailingBadge ?? null}
           </HStack>
@@ -237,7 +237,7 @@ export function OwnerProfileCard({ profile, onOpenRepositories, onOpenProfile, r
       </HStack>}
       {!compact && profile.location ? <OwnerInfoLine icon="mappin.and.ellipse" text={profile.location} /> : null}
       {!compact && profile.company ? <OwnerInfoLine icon="building.2" text={profile.company} /> : null}
-      {!compact && blogURL ? <Button action={() => { void openGitHubWebPage(blogURL, profile.blog ?? "") }} buttonStyle="plain"><OwnerInfoLine icon="link" text={profile.blog ?? ""} color="systemBlue" /></Button> : null}
+      {!compact && blogURL ? <Button action={() => { void openGitHubWebPage(blogURL, profile.blog ?? "") }} buttonStyle="plain"><OwnerInfoLine icon="link" text={profile.blog ?? ""} color={ACCENT} /></Button> : null}
       {compact ? null : <OwnerInfoLine icon="calendar" text={`加入于 ${new Date(profile.createdAt).toLocaleDateString()}`} />}
       {accessory ?? null}
     </VStack>
@@ -247,10 +247,10 @@ export function OwnerProfileCard({ profile, onOpenRepositories, onOpenProfile, r
 function OwnerStat({ value, label, tappable = false }: { value: number; label: string; tappable?: boolean }) {
   return (
     <VStack spacing={1} alignment="leading">
-      <Text font={16} fontWeight="semibold" foregroundStyle={tappable ? "systemBlue" : "label"}>{compactNumber(value)}</Text>
+      <Text font={16} fontWeight="semibold" foregroundStyle={tappable ? ACCENT : "label"}>{compactNumber(value)}</Text>
       <HStack spacing={2}>
-        <Text font={11} foregroundStyle={tappable ? "systemBlue" : "secondaryLabel"}>{label}</Text>
-        {tappable ? <Image systemName="chevron.right" font={9} fontWeight="semibold" foregroundStyle="systemBlue" /> : null}
+        <Text font={11} foregroundStyle={tappable ? ACCENT : "secondaryLabel"}>{label}</Text>
+        {tappable ? <Image systemName="chevron.right" font={9} fontWeight="semibold" foregroundStyle={ACCENT} /> : null}
       </HStack>
     </VStack>
   )

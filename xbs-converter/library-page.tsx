@@ -11,6 +11,9 @@ import { SOURCE_TEMPLATE } from "./template"
 
 type ImportItem = { name: string; origin: SourceOrigin; text: string }
 
+/** 主页标题用 script.json 的英文名，自绘在导航栏中间。 */
+const TITLE = "XBS Converter"
+
 /** 单页书源库：导入 XBS / JSON、粘贴、新建模板；卡片进入详情或直接导出。 */
 export function LibraryPage({ initialEntries, notice }: { initialEntries: LibraryEntry[]; notice?: string }) {
   const dismiss = Navigation.useDismiss()
@@ -143,7 +146,7 @@ export function LibraryPage({ initialEntries, notice }: { initialEntries: Librar
         listStyle="inset"
         scrollContentBackground="hidden"
         background="systemGroupedBackground"
-        navigationTitle="XBS Converter"
+        navigationTitle={TITLE}
         navigationBarTitleDisplayMode="inline"
         // 推入详情挂在 List 上：放在 List 行内的 navigationDestination 不会触发。
         navigationDestination={{
@@ -156,7 +159,8 @@ export function LibraryPage({ initialEntries, notice }: { initialEntries: Librar
             : <></>,
         }}
         toolbar={{
-          cancellationAction: <Button title="关闭" action={() => dismiss()} />,
+          cancellationAction: <Button title="关闭" systemImage="xmark" action={() => dismiss()} />,
+          principal: <Text font={17} fontWeight="semibold" foregroundStyle="label">{TITLE}</Text>,
           primaryAction: <Button title="设置" systemImage={password ? "gearshape.fill" : "gearshape"} action={() => void openSettings()} />,
         }}
       >

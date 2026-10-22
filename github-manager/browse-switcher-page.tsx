@@ -1,5 +1,5 @@
 import { Button, HStack, Image, List, Navigation, Section, Text, Toolbar, ToolbarItem, VStack, useState } from "scripting"
-import { GLASS, MODE_STYLE, relativeTime, SettingRow, StatusSurface } from "./glass-ui"
+import { ACCENT, GLASS, MODE_STYLE, relativeTime, SettingRow, StatusSurface } from "./glass-ui"
 import { currentBrowseIdentity, hasGitHubToken, readBrowseHistory, readTokenInfo, readUserSnapshot, removeBrowseUser } from "./github-api"
 
 /** 设置页主页卡右上角进入：浏览记录、输入新用户、授权浏览时回到本人。每个用户的资料与 Star 已持久化，切换后直接显示。 */
@@ -37,11 +37,11 @@ export function BrowseSwitcherPage({ onAddUser, onSwitch }: { onAddUser: () => P
       background="systemGroupedBackground"
       navigationTitle="切换浏览用户"
       navigationBarTitleDisplayMode="inline"
-      toolbar={<Toolbar><ToolbarItem placement="cancellationAction"><Button title="关闭" action={dismiss} /></ToolbarItem></Toolbar>}
+      toolbar={<Toolbar><ToolbarItem placement="cancellationAction"><Button title="关闭" systemImage="xmark" action={dismiss} /></ToolbarItem></Toolbar>}
     >
       <Section listRowBackground={<></>} listRowSeparator="hidden">
         <VStack spacing={12} frame={{ maxWidth: "infinity" }} listRowBackground={<></>} listRowSeparator="hidden">
-          <SettingRow icon="plus" tint="systemBlue" title="输入用户名" subtitle={tokenActive ? "浏览任意用户，请求仍使用 Token 限额" : "浏览任意用户的主页与公开 Star"} action={() => { void addUser() }} />
+          <SettingRow icon="plus" tint={ACCENT} title="输入用户名" subtitle={tokenActive ? "浏览任意用户，请求仍使用 Token 限额" : "浏览任意用户的主页与公开 Star"} action={() => { void addUser() }} />
           {owner ? <BrowseUserRow login={owner} tag="本人" current={current === owner.toLowerCase()} onSelect={() => choose(null)} /> : null}
           <Text font={13} fontWeight="semibold" foregroundStyle="secondaryLabel" padding={{ horizontal: 4, top: 6 }} frame={{ maxWidth: "infinity", alignment: "leading" }}>浏览记录</Text>
           {entries.length === 0 ? <StatusSurface icon="clock.arrow.circlepath" title="暂无浏览记录" detail="切换过的用户会保存在这里，资料与 Star 缓存在本机，再次切换无需重新请求。" /> : null}
@@ -76,7 +76,7 @@ function BrowseUserRow({ login, tag, current, onSelect, onDelete }: { login: str
           <VStack spacing={2} alignment="leading" frame={{ maxWidth: "infinity", alignment: "leading" }}>
             <HStack spacing={6}>
               <Text font={15} fontWeight="semibold" foregroundStyle="label" lineLimit={1}>{account?.name ?? login}</Text>
-              {tag ? <Text font={11} fontWeight="semibold" foregroundStyle="systemBlue" padding={{ horizontal: 7, vertical: 2 }} glassEffect={GLASS.capsule}>{tag}</Text> : null}
+              {tag ? <Text font={11} fontWeight="semibold" foregroundStyle={ACCENT} padding={{ horizontal: 7, vertical: 2 }} glassEffect={GLASS.capsule}>{tag}</Text> : null}
             </HStack>
             <Text font={12} foregroundStyle="secondaryLabel" lineLimit={1}>{`@${login} · ${detail}`}</Text>
           </VStack>

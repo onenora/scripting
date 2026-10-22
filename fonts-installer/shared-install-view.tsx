@@ -18,9 +18,10 @@ import {
 import { formatFileSize, type FontInfo } from "./font"
 import { prepareFontForInstall } from "./font-instance"
 import { recordInstalledFont } from "./font-history"
-import { ACCENT, CapsuleButton, DetailRow, errorMessage, GLASS, PageBackground, uiFont } from "./glass-ui"
+import { ACCENT, CapsuleButton, DetailRow, errorMessage, GLASS } from "./glass-ui"
 import { openFontInstaller } from "./profile"
 import { createFontPreviewHTML } from "./preview"
+import { useUIFont } from "./ui-font"
 
 type PreviewState = "loading" | "ready" | { status: "error"; message: string }
 
@@ -31,6 +32,7 @@ export function SharedFontInstallView({ fonts, previewDirectory, fontFileName }:
   fontFileName: string
 }) {
   const dismiss = Navigation.useDismiss()
+  const font = useUIFont()
   const [selectedIndex, setSelectedIndex] = useState(0)
   const controller = useMemo(() => new WebViewController({ ephemeral: true }), [selectedIndex])
   const selectedFont = fonts[selectedIndex]
@@ -98,61 +100,62 @@ export function SharedFontInstallView({ fonts, previewDirectory, fontFileName }:
 
   return (
     <NavigationStack>
-      <ZStack
+      <VStack
+        spacing={12}
+        padding={{ top: 12, bottom: 16, horizontal: 16 }}
+        frame={{ maxWidth: "infinity", maxHeight: "infinity" }}
+        background="systemGroupedBackground"
         navigationTitle="预览并安装"
         navigationBarTitleDisplayMode="inline"
-        toolbar={{ cancellationAction: <Button title="取消" action={() => dismiss()} /> }}
+        toolbar={{ cancellationAction: <Button title="取消" systemImage="xmark" action={() => dismiss()} /> }}
       >
-        <PageBackground />
-        <VStack spacing={12} padding={{ top: 12, bottom: 16, horizontal: 16 }} frame={{ maxWidth: "infinity", maxHeight: "infinity" }}>
-          <VStack spacing={10} padding={{ horizontal: 16, vertical: 14 }} frame={{ maxWidth: "infinity", alignment: "leading" }} glassEffect={GLASS.content}>
-            <HStack spacing={12} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-              <Image systemName="f.cursive" font={20} fontWeight="semibold" foregroundStyle={ACCENT} frame={{ width: 28 }} />
-              <VStack spacing={2} alignment="leading" frame={{ maxWidth: "infinity", alignment: "leading" }}>
-                <Text font={uiFont(16)} fontWeight="semibold" foregroundStyle="label" lineLimit={1}>{selectedFont.fullName}</Text>
-                <Text font={uiFont(12)} foregroundStyle="secondaryLabel" lineLimit={1}>{`${selectedFont.format} · ${formatFileSize(selectedFont.fileSize)}`}</Text>
-              </VStack>
-              {fonts.length > 1 ? (
-                <Picker
-                  title="选择字重"
-                  value={selectedIndex}
-                  disabled={installing}
-                  onChanged={(index: number) => {
-                    setPreviewState("loading")
-                    setCopyMessage(null)
-                    setSelectedIndex(index)
-                  }}
-                  pickerStyle="menu"
-                >
-                  {fonts.map((font, index) => <Text tag={index}>{font.styleName}</Text>)}
-                </Picker>
-              ) : null}
-            </HStack>
-            <DetailRow label="字体家族" value={selectedFont.familyName} disabled={installing} onCopy={() => void copyFontValue(selectedFont.familyName, "字体家族名称")} />
-            <DetailRow label="PostScript" value={selectedFont.postScriptName} disabled={installing} onCopy={() => void copyFontValue(selectedFont.postScriptName, "PostScript 名称")} />
-            {copyMessage ? <Text font={uiFont(12)} foregroundStyle="systemGreen">{copyMessage}</Text> : null}
-          </VStack>
-
-          <ZStack frame={{ maxWidth: "infinity", maxHeight: "infinity" }} clipShape={{ type: "rect", cornerRadius: 16, style: "continuous" }}>
-            <WebView controller={controller} frame={{ maxWidth: "infinity", maxHeight: "infinity" }} />
-            {previewState === "loading" ? (
-              <VStack spacing={10}>
-                <ProgressView progressViewStyle="circular" />
-                <Text font={uiFont(13)} foregroundStyle="secondaryLabel">正在生成字体预览…</Text>
-              </VStack>
+        <VStack spacing={10} padding={{ horizontal: 16, vertical: 14 }} frame={{ maxWidth: "infinity", alignment: "leading" }} glassEffect={GLASS.content}>
+          <HStack spacing={12} frame={{ maxWidth: "infinity", alignment: "leading" }}>
+            <Image systemName="f.cursive" font={20} fontWeight="semibold" foregroundStyle={ACCENT} frame={{ width: 28 }} />
+            <VStack spacing={2} alignment="leading" frame={{ maxWidth: "infinity", alignment: "leading" }}>
+              <Text font={font(16)} fontWeight="semibold" foregroundStyle="label" lineLimit={1}>{selectedFont.fullName}</Text>
+              <Text font={font(12)} foregroundStyle="secondaryLabel" lineLimit={1}>{`${selectedFont.format} · ${formatFileSize(selectedFont.fileSize)}`}</Text>
+            </VStack>
+            {fonts.length > 1 ? (
+              <Picker
+                title="选择字重"
+                value={selectedIndex}
+                disabled={installing}
+                onChanged={(index: number) => {
+                  setPreviewState("loading")
+                  setCopyMessage(null)
+                  setSelectedIndex(index)
+                }}
+                pickerStyle="menu"
+              >
+                {fonts.map((font, index) => <Text tag={index}>{font.styleName}</Text>)}
+              </Picker>
             ) : null}
-            {typeof previewState === "object" ? (
-              <VStack spacing={8} padding={20}>
-                <Image systemName="exclamationmark.triangle" font={24} foregroundStyle="systemOrange" />
-                <Text font={uiFont(17)} fontWeight="semibold" foregroundStyle="label">无法显示预览</Text>
-                <Text font={uiFont(13)} foregroundStyle="secondaryLabel" multilineTextAlignment="center">{previewState.message}</Text>
-              </VStack>
-            ) : null}
-          </ZStack>
-
-          <CapsuleButton title={installing ? "正在准备安装…" : "安装到系统"} icon="checkmark.shield" prominent disabled={!previewReady || installing} action={() => void installFont()} />
+          </HStack>
+          <DetailRow label="字体家族" value={selectedFont.familyName} disabled={installing} onCopy={() => void copyFontValue(selectedFont.familyName, "字体家族名称")} />
+          <DetailRow label="PostScript" value={selectedFont.postScriptName} disabled={installing} onCopy={() => void copyFontValue(selectedFont.postScriptName, "PostScript 名称")} />
+          {copyMessage ? <Text font={font(12)} foregroundStyle="systemGreen">{copyMessage}</Text> : null}
         </VStack>
-      </ZStack>
+
+        <ZStack frame={{ maxWidth: "infinity", maxHeight: "infinity" }} clipShape={{ type: "rect", cornerRadius: 16, style: "continuous" }}>
+          <WebView controller={controller} frame={{ maxWidth: "infinity", maxHeight: "infinity" }} />
+          {previewState === "loading" ? (
+            <VStack spacing={10}>
+              <ProgressView progressViewStyle="circular" />
+              <Text font={font(13)} foregroundStyle="secondaryLabel">正在生成字体预览…</Text>
+            </VStack>
+          ) : null}
+          {typeof previewState === "object" ? (
+            <VStack spacing={8} padding={20}>
+              <Image systemName="exclamationmark.triangle" font={24} foregroundStyle="systemOrange" />
+              <Text font={font(17)} fontWeight="semibold" foregroundStyle="label">无法显示预览</Text>
+              <Text font={font(13)} foregroundStyle="secondaryLabel" multilineTextAlignment="center">{previewState.message}</Text>
+            </VStack>
+          ) : null}
+        </ZStack>
+
+        <CapsuleButton title={installing ? "正在准备安装…" : "安装到系统"} icon="checkmark.shield" prominent disabled={!previewReady || installing} action={() => void installFont()} />
+      </VStack>
     </NavigationStack>
   )
 }

@@ -12,11 +12,11 @@
     "ja" : "",
     "it" : "",
     "ru" : "",
-    "zh" : "",
+    "zh" : "GitHub 管理",
     "pt" : "",
     "de" : ""
   },
-  "version" : "3.0.4",
+  "version" : "3.1.0",
   "localizedDescriptions" : {
     "en" : "",
     "ja" : "",
@@ -45,5 +45,5 @@
   "contributors" : [
 
   ],
-  "color" : "rgba(255, 0, 0, 1.00)"
+  "color" : "rgba(0, 122, 255, 1.00)"
 }

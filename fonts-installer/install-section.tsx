@@ -2,15 +2,14 @@ import { Button, HStack, Image, Path, Section, Spacer, Text, VStack, useState } 
 import { formatFileSize, inspectFontFileVariants, type InspectedFont } from "./font"
 import { prepareFontForInstall } from "./font-instance"
 import { recordInstalledFont, type FontHistoryEntry } from "./font-history"
-import { ACCENT, CapsuleButton, DetailRow, errorMessage, FootNote, GLASS, HeaderIconButton, SectionTitle, StatusSurface, Tag, uiFont } from "./glass-ui"
+import { ACCENT, CapsuleButton, CARD_ROW, DetailRow, errorMessage, FootNote, GLASS, HeaderIconButton, SectionTitle, StatusSurface, Tag } from "./glass-ui"
 import { openFontInstaller } from "./profile"
 import { presentFontPreview } from "./preview"
+import { useUIFont } from "./ui-font"
 
-/**
- * 导入字体文件，逐个预览或生成描述文件安装；安装成功后写入字体历史。
- * `appliedFont` 只用于切换界面字体时触发重绘（Scripting 只重绘 props 变化的组件），字体本身由 `uiFont()` 读取。
- */
-export function InstallSection({ onHistoryChange }: { onHistoryChange: (entries: FontHistoryEntry[]) => void; appliedFont: string | null }) {
+/** 导入字体文件，逐个预览或生成描述文件安装；安装成功后写入字体历史。 */
+export function InstallSection({ onHistoryChange }: { onHistoryChange: (entries: FontHistoryEntry[]) => void }) {
+  const font = useUIFont()
   const [fonts, setFonts] = useState<InspectedFont[]>([])
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState("")
@@ -110,7 +109,11 @@ export function InstallSection({ onHistoryChange }: { onHistoryChange: (entries:
         action={fonts.length || busy ? <HeaderIconButton icon="plus" label="更换字体" busy={busy} action={() => void importFonts()} /> : undefined}
       />
       {fonts.length === 0
-        ? <StatusSurface icon="doc.badge.plus" title="导入字体" detail="可多选 .ttf / .otf，不支持 .ttc / .otc 字体集合。" actionTitle="选择字体文件" actionSystemImage="square.and.arrow.down" action={() => void importFonts()} />
+        ? (
+          <StatusSurface icon="doc.badge.plus" title="导入字体" detail="可多选 .ttf / .otf，不支持 .ttc / .otc 字体集合。">
+            <CapsuleButton title="选择字体文件" icon="square.and.arrow.down" prominent disabled={busy} action={() => void importFonts()} />
+          </StatusSurface>
+        )
         : null}
       {/* 每个字体单独成行，才能左滑取消。 */}
       {fonts.map((selected, index) => (
@@ -124,7 +127,7 @@ export function InstallSection({ onHistoryChange }: { onHistoryChange: (entries:
           onCancel={() => cancelFont(selected)}
         />
       ))}
-      {status ? <Text font={uiFont(12)} foregroundStyle="secondaryLabel" lineLimit={2} frame={{ maxWidth: "infinity", alignment: "center" }} listRowBackground={<></>} listRowSeparator="hidden">{status}</Text> : null}
+      {status ? <Text font={font(12)} foregroundStyle="secondaryLabel" lineLimit={2} frame={{ maxWidth: "infinity", alignment: "center" }} listRowBackground={<></>} listRowSeparator="hidden">{status}</Text> : null}
       <FootNote>点按「安装到系统」后，iOS 会接管配置描述文件，请按系统提示在「设置」中确认安装；删除字体也需在「设置」的描述文件页面移除。</FootNote>
     </Section>
   )
@@ -138,6 +141,7 @@ function FontCard({ item, busy, onCopy, onPreview, onInstall, onCancel }: {
   onInstall: () => void
   onCancel: () => void
 }) {
+  const font = useUIFont()
   const info = item.info
   return (
     <VStack
@@ -145,18 +149,16 @@ function FontCard({ item, busy, onCopy, onPreview, onInstall, onCancel }: {
       padding={{ horizontal: 16, vertical: 14 }}
       frame={{ maxWidth: "infinity", alignment: "leading" }}
       glassEffect={GLASS.content}
-      listRowBackground={<></>}
-      listRowSeparator="hidden"
-      listRowInsets={{ top: 4, leading: 20, bottom: 4, trailing: 20 }}
+      {...CARD_ROW}
       trailingSwipeActions={{ actions: [<Button title="取消" systemImage="xmark" role="destructive" disabled={busy} action={onCancel} />] }}
     >
       <HStack spacing={12} frame={{ maxWidth: "infinity", alignment: "leading" }}>
         <Image systemName="f.cursive" font={20} fontWeight="semibold" foregroundStyle={ACCENT} frame={{ width: 28 }} />
         <VStack spacing={2} alignment="leading" frame={{ maxWidth: "infinity", alignment: "leading" }}>
-          <Text font={uiFont(16)} fontWeight="semibold" foregroundStyle="label" lineLimit={1}>{info.fullName}</Text>
-          <Text font={uiFont(12)} foregroundStyle="secondaryLabel" lineLimit={1}>{`${info.fileName} · ${info.format} · ${formatFileSize(info.fileSize)}`}</Text>
+          <Text font={font(16)} fontWeight="semibold" foregroundStyle="label" lineLimit={1}>{info.fullName}</Text>
+          <Text font={font(12)} foregroundStyle="secondaryLabel" lineLimit={1}>{`${info.fileName} · ${info.format} · ${formatFileSize(info.fileSize)}`}</Text>
         </VStack>
-        {info.variation ? <Tag text="可变字重" color="systemPurple" /> : <Tag text="已验证" color="systemGreen" />}
+        {info.variation ? <Tag text="可变字重" color="systemPurple" icon="slider.horizontal.3" /> : <Tag text="已验证" color="systemGreen" icon="checkmark.seal" />}
       </HStack>
       <VStack spacing={8} frame={{ maxWidth: "infinity", alignment: "leading" }}>
         <DetailRow label="字体家族" value={info.familyName} onCopy={() => onCopy(info.familyName, "字体家族")} />

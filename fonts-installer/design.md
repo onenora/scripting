@@ -17,7 +17,7 @@ intent.tsx
 └─ SharedFontInstallView               # 快捷指令 / 分享表单传入单个字体
 ```
 
-`FontsInstaller` 持有字体历史与界面字体：安装成功后由 `InstallSection` 回写历史；界面字体变化时作为 props 传给两个分组触发重绘。
+`FontsInstaller` 持有字体历史：安装成功后由 `InstallSection` 回写历史。界面字体由 `ui-font.ts` 保存，组件通过 `useUIFont()` / `useFontName()` 订阅，切换后同步重绘。
 
 ## 模块
 
@@ -30,7 +30,8 @@ intent.tsx
 | `installed-font-preview.tsx` | 已安装字体的原生样张 |
 | `font-history.ts` | 字体历史存储（最多 100 条） |
 | `shared-font.ts` | 清理分享传入文件的书签 |
-| `glass-ui.tsx` | 通用组件与界面字体：`SectionTitle`、`StatusSurface`、`CapsuleButton`、`DetailRow`、`FootNote`、`uiFont` 等 |
+| `glass-ui.tsx` | 通用组件：`SectionTitle`、`StatusSurface`、`CapsuleButton`、`DetailRow`、`FootNote`、`Tag` 等 |
+| `ui-font.ts` | 界面字体：`setFontName`、`useFontName`、`useUIFont` |
 | `install-section.tsx` / `history-section.tsx` | 主页两个分组 |
 | `shared-install-view.tsx` | 分享传入字体的预览安装页，多字重时顶部切换 |
 

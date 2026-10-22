@@ -1,19 +1,17 @@
-import { Button, List, Navigation, NavigationStack, Script, Toolbar, ToolbarItem, useState } from "scripting"
+import { Button, List, Navigation, NavigationStack, Script, Text, useState } from "scripting"
 import { loadFontHistory } from "./font-history"
-import { errorMessage, readUIFont, saveUIFont } from "./glass-ui"
+import { errorMessage } from "./glass-ui"
 import { HistorySection } from "./history-section"
 import { InstallSection } from "./install-section"
+import { useUIFont } from "./ui-font"
+
+const TITLE = "Fonts Installer"
 
 /** 单页：上方导入与安装，下方安装历史。 */
 function FontsInstaller() {
   const dismiss = Navigation.useDismiss()
+  const font = useUIFont()
   const [history, setHistory] = useState(loadFontHistory)
-  const [appliedFont, setAppliedFont] = useState(readUIFont)
-
-  function applyFont(name: string | null) {
-    saveUIFont(name)
-    setAppliedFont(name)
-  }
 
   return (
     <NavigationStack>
@@ -21,12 +19,15 @@ function FontsInstaller() {
         listStyle="inset"
         scrollContentBackground="hidden"
         background="systemGroupedBackground"
-        navigationTitle="Fonts Installer"
+        navigationTitle={TITLE}
         navigationBarTitleDisplayMode="inline"
-        toolbar={<Toolbar><ToolbarItem placement="cancellationAction"><Button title="关闭" action={() => dismiss()} /></ToolbarItem></Toolbar>}
+        toolbar={{
+          cancellationAction: <Button title="关闭" systemImage="xmark" action={() => dismiss()} />,
+          principal: <Text font={font(17)} fontWeight="semibold" foregroundStyle="label">{TITLE}</Text>,
+        }}
       >
-        <InstallSection onHistoryChange={setHistory} appliedFont={appliedFont} />
-        <HistorySection entries={history} onChange={setHistory} appliedFont={appliedFont} onApplyFont={applyFont} />
+        <InstallSection onHistoryChange={setHistory} />
+        <HistorySection entries={history} onChange={setHistory} />
       </List>
     </NavigationStack>
   )

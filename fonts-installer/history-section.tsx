@@ -1,15 +1,15 @@
 import { Button, HStack, Image, Section, Text, VStack, useState } from "scripting"
 import { recordPickedFont, removeFontHistoryEntry, type FontHistoryEntry } from "./font-history"
-import { ACCENT, errorMessage, FootNote, formatRecordedAt, GLASS, HeaderIconButton, SectionTitle, Tag, uiFont } from "./glass-ui"
+import { ACCENT, CARD_ROW, errorMessage, FootNote, formatRecordedAt, GLASS, HeaderIconButton, SectionTitle, Tag } from "./glass-ui"
 import { presentInstalledFontPreview } from "./installed-font-preview"
+import { setFontName, useFontName, useUIFont } from "./ui-font"
 
 /** 安装历史：本脚本安装过的字体，以及从系统 FontPicker 加入的已安装字体；每条记录单独成行以支持左滑删除或应用为界面字体。 */
-export function HistorySection({ entries, onChange, appliedFont, onApplyFont }: {
+export function HistorySection({ entries, onChange }: {
   entries: FontHistoryEntry[]
   onChange: (entries: FontHistoryEntry[]) => void
-  appliedFont: string | null
-  onApplyFont: (name: string | null) => void
 }) {
+  const appliedFont = useFontName()
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
   const summary = status ?? (entries.length ? `${entries.length} 条` : "暂无记录")
@@ -42,7 +42,7 @@ export function HistorySection({ entries, onChange, appliedFont, onApplyFont }: 
     try {
       onChange(removeFontHistoryEntry(entry.postScriptName))
       // 删除正在使用的字体记录时一并还原，避免没有入口还原系统字体。
-      if (entry.postScriptName === appliedFont) onApplyFont(null)
+      if (entry.postScriptName === appliedFont) setFontName(null)
       setStatus(`已删除：${entry.fullName}`)
     } catch (error) {
       await Dialog.alert({ title: "无法删除字体记录", message: errorMessage(error) })
@@ -50,7 +50,7 @@ export function HistorySection({ entries, onChange, appliedFont, onApplyFont }: 
   }
 
   function apply(entry: FontHistoryEntry | null) {
-    onApplyFont(entry?.postScriptName ?? null)
+    setFontName(entry?.postScriptName ?? null)
     setStatus(entry ? `界面字体：${entry.fullName}` : "已还原系统字体")
     HapticFeedback.notificationSuccess()
   }
@@ -92,6 +92,7 @@ function HistoryRow({ entry, applied, onPreview, onCopy, onDelete, onApply }: {
   onDelete: () => void
   onApply: () => void
 }) {
+  const font = useUIFont()
   const installed = entry.source === "installer"
   const detail = [entry.styleName, formatRecordedAt(entry.recordedAt)].filter(Boolean).join(" · ")
   return (
@@ -100,9 +101,7 @@ function HistoryRow({ entry, applied, onPreview, onCopy, onDelete, onApply }: {
       padding={{ horizontal: 14, vertical: 10 }}
       frame={{ maxWidth: "infinity", alignment: "leading" }}
       glassEffect={GLASS.interactive}
-      listRowBackground={<></>}
-      listRowSeparator="hidden"
-      listRowInsets={{ top: 4, leading: 20, bottom: 4, trailing: 20 }}
+      {...CARD_ROW}
       trailingSwipeActions={{
         actions: [
           <Button title="删除" systemImage="trash" role="destructive" action={onDelete} />,
@@ -117,12 +116,12 @@ function HistoryRow({ entry, applied, onPreview, onCopy, onDelete, onApply }: {
           <Image systemName="f.cursive" font={18} fontWeight="semibold" foregroundStyle={installed ? "systemGreen" : ACCENT} frame={{ width: 28 }} />
           <VStack spacing={2} alignment="leading" frame={{ maxWidth: "infinity", alignment: "leading" }}>
             <HStack spacing={6}>
-              <Text font={uiFont(15)} fontWeight="semibold" foregroundStyle="label" lineLimit={1}>{entry.fullName}</Text>
-              <Tag text={installed ? "安装" : "系统"} color={installed ? "systemGreen" : ACCENT} />
-              {applied ? <Tag text="界面使用中" color="systemOrange" /> : null}
+              <Text font={font(15)} fontWeight="semibold" foregroundStyle="label" lineLimit={1}>{entry.fullName}</Text>
+              <Tag text={installed ? "安装" : "系统"} color={installed ? "systemGreen" : ACCENT} icon={installed ? "checkmark.shield" : "iphone"} />
+              {applied ? <Tag text="界面使用中" color="systemOrange" icon="paintbrush" /> : null}
             </HStack>
-            <Text font={uiFont(12)} foregroundStyle="secondaryLabel" lineLimit={1}>{entry.postScriptName}</Text>
-            <Text font={uiFont(11)} foregroundStyle="tertiaryLabel" lineLimit={1}>{detail}</Text>
+            <Text font={font(12)} foregroundStyle="secondaryLabel" lineLimit={1}>{entry.postScriptName}</Text>
+            <Text font={font(11)} foregroundStyle="tertiaryLabel" lineLimit={1}>{detail}</Text>
           </VStack>
         </HStack>
       </Button>

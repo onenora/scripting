@@ -5,7 +5,6 @@ import {
   List,
   Navigation,
   NavigationStack,
-  Script,
   Section,
   Text,
   Toolbar,
@@ -14,7 +13,7 @@ import {
   useState,
   type VirtualNode,
 } from "scripting"
-import { CapabilityLine, GITHUB_SYMBOL, GLASS, MODE_STYLE, ModeBadge, relativeTime, SettingRow } from "./glass-ui"
+import { AboutCard, AboutLine, CapabilityLine, GLASS, MODE_STYLE, ModeBadge, relativeTime, SectionTitle, SettingRow } from "./glass-ui"
 import { hasGitHubToken, isBrowsingTokenOwner, readTokenInfo } from "./github-api"
 import { BrowseSwitcherPage } from "./browse-switcher-page"
 import { openReleaseDownloads } from "./repository-pages"
@@ -62,12 +61,16 @@ export function AccountPage({
           {mode === "none" && tokenInfo ? <PausedTokenCard info={tokenInfo} actions={actions} /> : null}
           {mode === "none" ? <ModeChooser onChoosePublic={() => { void actions.onConfigureUsername() }} onChooseToken={actions.onConfigureToken} /> : null}
           {mode !== "none" ? <BrowseManagement mode={mode} account={account} accountState={accountState} username={username} tokenInfo={tokenInfo} actions={actions} /> : null}
-          <SectionTitle title="工具" />
+          <SectionTitle icon="wrench.and.screwdriver" title="工具" />
           <SettingRow icon="link" title="GitHub Raw 链接转换" action={actions.onConvertRawLink} />
           <SettingRow icon="folder" title="Release 下载文件夹" action={() => { void openReleaseDownloads() }} />
           {mode === "token" ? <TokenSecurityRow info={tokenInfo} failed={accountState === "error"} actions={actions} /> : null}
-          <SectionTitle title="关于" />
-          <AboutSection />
+          <SectionTitle icon="info.circle" title="关于" />
+          <AboutCard>
+            <AboutLine icon="eye" title="只读访问" detail="浏览 Stars、仓库文件、Release 与作者主页，不会修改 GitHub 上的任何内容。" />
+            <AboutLine icon="internaldrive" title="本地数据" detail="收藏、置顶、Release 订阅与下载文件只保存在本机，与账户无关。" />
+            <AboutLine icon="key.fill" title="Token 安全" detail="加密保存在钥匙串，仅此设备可读，不同步 iCloud，界面不显示完整 Token。" />
+          </AboutCard>
         </VStack>
       </Section>
     </List>
@@ -167,7 +170,7 @@ function PausedTokenCard({ info, actions }: { info: TokenInfo; actions: AccountA
   const kind = TOKEN_KIND_TITLE[info.kind]
   return (
     <VStack spacing={12} frame={{ maxWidth: "infinity" }}>
-      <SectionTitle title="已保存的 Token" />
+      <SectionTitle icon="key.horizontal" title="已保存的 Token" />
       <SettingRow icon="arrow.uturn.backward.circle" tint={MODE_STYLE.token.color} title="恢复授权浏览" subtitle={`使用钥匙串中的 ${kind.prefix}••••${info.suffix}`} action={() => { void actions.onResumeToken() }} />
       <SettingRow icon="trash" title="删除 Token" subtitle="从钥匙串永久删除" destructive action={() => { void actions.onDeleteToken() }} />
     </VStack>
@@ -218,19 +221,19 @@ function TokenSecurityPage({ actions }: { actions: AccountActions }) {
       background="systemGroupedBackground"
       navigationTitle="GitHub Token 管理"
       navigationBarTitleDisplayMode="inline"
-      toolbar={<Toolbar><ToolbarItem placement="cancellationAction"><Button title="关闭" action={dismiss} /></ToolbarItem></Toolbar>}
+      toolbar={<Toolbar><ToolbarItem placement="cancellationAction"><Button title="关闭" systemImage="xmark" action={dismiss} /></ToolbarItem></Toolbar>}
     >
       <Section listRowBackground={<></>} listRowSeparator="hidden">
         <VStack spacing={12} frame={{ maxWidth: "infinity" }} listRowBackground={<></>} listRowSeparator="hidden">
-          <SectionTitle title="存储" />
+          <SectionTitle icon="lock.shield" title="存储" />
           {info ? <TokenSecurityCard info={info} /> : null}
           {info && info.storage !== "passcode" ? <SettingRow icon="lock.badge.clock" tint="systemOrange" title="提升保护等级" subtitle="重新写入钥匙串，改为需设备密码才能读取" action={() => { void run(actions.onUpgradeTokenProtection) }} /> : null}
-          <SectionTitle title="管理" />
+          <SectionTitle icon="slider.horizontal.3" title="管理" />
           <SettingRow icon="checkmark.shield" tint={tint} title="重新验证" subtitle="重新读取账户身份与过期时间" action={() => { void run(actions.onVerifyToken) }} />
           <SettingRow icon="key.horizontal" tint={tint} title="更换 Token" subtitle="保存前会先验证新 Token 是否有效" action={() => { void run(actions.onConfigureToken) }} />
           <SettingRow icon="rectangle.portrait.and.arrow.right" tint="systemOrange" title="退出授权" subtitle="改为公共浏览，Token 保留在钥匙串可随时恢复" action={() => { void run(actions.onSignOutToken) }} />
           <SettingRow icon="trash" title="删除 Token" subtitle="从钥匙串永久删除" destructive action={() => { void run(actions.onDeleteToken) }} />
-          <SectionTitle title="创建 Token" />
+          <SectionTitle icon="plus.circle" title="创建 Token" />
           <TokenGuide />
         </VStack>
       </Section>
@@ -302,10 +305,6 @@ function IdentityCard({ mode, account, login, status, warning = false, headerAct
   )
 }
 
-function SectionTitle({ title }: { title: string }) {
-  return <Text font={13} fontWeight="semibold" foregroundStyle="secondaryLabel" padding={{ horizontal: 4, top: 6 }} frame={{ maxWidth: "infinity", alignment: "leading" }}>{title}</Text>
-}
-
 function TokenGuide() {
   return (
     <VStack spacing={12} alignment="leading" padding={{ horizontal: 16, vertical: 14 }} frame={{ maxWidth: "infinity", alignment: "leading" }} glassEffect={GLASS.content}>
@@ -326,35 +325,5 @@ function TokenGuideItem({ title, permission, detail }: { title: string; permissi
       <Text font={13} fontWeight="medium" foregroundStyle="systemGreen" frame={{ maxWidth: "infinity", alignment: "leading" }} multilineTextAlignment="leading" fixedSize={{ horizontal: false, vertical: true }}>{permission}</Text>
       <Text font={13} foregroundStyle="secondaryLabel" frame={{ maxWidth: "infinity", alignment: "leading" }} multilineTextAlignment="leading" fixedSize={{ horizontal: false, vertical: true }}>{detail}</Text>
     </VStack>
-  )
-}
-
-/** 关于：应用名与版本，下方并列说明只读访问、本地数据与 Token 安全。 */
-function AboutSection() {
-  return (
-    <VStack spacing={14} alignment="leading" padding={{ horizontal: 16, vertical: 16 }} frame={{ maxWidth: "infinity", alignment: "leading" }} glassEffect={GLASS.content}>
-      <HStack spacing={12} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-        <Image systemName={GITHUB_SYMBOL} font={22} fontWeight="semibold" foregroundStyle="systemRed" frame={{ width: 44, height: 44 }} glassEffect={GLASS.content} />
-        <VStack spacing={2} alignment="leading" frame={{ maxWidth: "infinity", alignment: "leading" }}>
-          <Text font={17} fontWeight="semibold">GitHub Manager</Text>
-          <Text font={13} foregroundStyle="secondaryLabel">版本 {Script.metadata.version}</Text>
-        </VStack>
-      </HStack>
-      <AboutLine icon="eye" title="只读访问" detail="浏览 Stars、仓库文件、Release 与作者主页，不会修改 GitHub 上的任何内容。" />
-      <AboutLine icon="internaldrive" title="本地数据" detail="收藏、置顶、Release 订阅与下载文件只保存在本机，与账户无关。" />
-      <AboutLine icon="key.fill" title="Token 安全" detail="加密保存在钥匙串，仅此设备可读，不同步 iCloud，界面不显示完整 Token。" />
-    </VStack>
-  )
-}
-
-function AboutLine({ icon, title, detail }: { icon: string; title: string; detail: string }) {
-  return (
-    <HStack spacing={12} alignment="top" frame={{ maxWidth: "infinity", alignment: "leading" }}>
-      <Image systemName={icon} font={15} foregroundStyle="secondaryLabel" frame={{ width: 22 }} />
-      <VStack spacing={2} alignment="leading" frame={{ maxWidth: "infinity", alignment: "leading" }}>
-        <Text font={14} fontWeight="medium">{title}</Text>
-        <Text font={13} foregroundStyle="secondaryLabel" multilineTextAlignment="leading" fixedSize={{ horizontal: false, vertical: true }}>{detail}</Text>
-      </VStack>
-    </HStack>
   )
 }

@@ -13,7 +13,7 @@ import {
   VStack,
   useState,
 } from "scripting"
-import { DESIGN, errorStatusDetail, GLASS, HeaderIconButton, openGitHubWebPage, PageBackground, relativeTime, StatusSurface } from "./glass-ui"
+import { ACCENT, DESIGN, errorStatusDetail, GLASS, HeaderIconButton, openGitHubWebPage, relativeTime, StatusSurface } from "./glass-ui"
 import {
   addReleaseSubscription,
   checkAllSubscriptions,
@@ -107,100 +107,98 @@ export function ReleaseTrackerPage({ onSubscriptionsChange }: { onSubscriptionsC
   }
 
   return (
-    <PageBackground>
-      <List
-        listStyle="inset"
-        scrollContentBackground="hidden"
-        scrollEdgeEffectHidden={{ edges: "top", hidden: true }}
-        listRowBackground={<></>}
-        listRowSeparator="hidden"
-        navigationTitle="Release 追踪"
-        navigationBarTitleDisplayMode="inline"
-      >
-        <Section listRowBackground={<></>} listRowSeparator="hidden">
-          <VStack spacing={12} frame={{ maxWidth: "infinity" }} listRowBackground={<></>} listRowSeparator="hidden">
-            <ReleaseHeader
-              total={subscriptions.length}
-              unreadCount={unreadCount}
-              checking={checking}
-              onCheck={() => { void handleCheckAll() }}
-              onAdd={() => { void handleAddSubscription() }}
-              onMarkAllRead={handleMarkAllRead}
+    <List
+      listStyle="inset"
+      scrollContentBackground="hidden"
+      scrollEdgeEffectHidden={{ edges: "top", hidden: true }}
+      listRowBackground={<></>}
+      listRowSeparator="hidden"
+      navigationTitle="Release 追踪"
+      navigationBarTitleDisplayMode="inline"
+    >
+      <Section listRowBackground={<></>} listRowSeparator="hidden">
+        <VStack spacing={12} frame={{ maxWidth: "infinity" }} listRowBackground={<></>} listRowSeparator="hidden">
+          <ReleaseHeader
+            total={subscriptions.length}
+            unreadCount={unreadCount}
+            checking={checking}
+            onCheck={() => { void handleCheckAll() }}
+            onAdd={() => { void handleAddSubscription() }}
+            onMarkAllRead={handleMarkAllRead}
+          />
+
+          {checkError ? (
+            <StatusSurface
+              icon="exclamationmark.triangle.fill"
+              title="检查提示"
+              detail={errorStatusDetail(checkError)}
+              action={() => { void handleCheckAll() }}
+              actionTitle="重新检查"
             />
+          ) : null}
 
-            {checkError ? (
-              <StatusSurface
-                icon="exclamationmark.triangle.fill"
-                title="检查提示"
-                detail={errorStatusDetail(checkError)}
-                action={() => { void handleCheckAll() }}
-                actionTitle="重新检查"
-              />
-            ) : null}
+          {/* 空状态 */}
+          {subscriptions.length === 0 ? (
+            <StatusSurface
+              icon="bell.slash"
+              title="暂无订阅仓库"
+              detail="轻点任意仓库选择「订阅 Release 更新」，或手动输入 owner/repo。"
+              action={() => { void handleAddSubscription() }}
+              actionTitle="添加订阅"
+              actionSystemImage="plus"
+            />
+          ) : null}
 
-            {/* 空状态 */}
-            {subscriptions.length === 0 ? (
-              <StatusSurface
-                icon="bell.slash"
-                title="暂无订阅仓库"
-                detail="轻点任意仓库选择「订阅 Release 更新」，或手动输入 owner/repo。"
-                action={() => { void handleAddSubscription() }}
-                actionTitle="添加订阅"
-                actionSystemImage="plus"
-              />
-            ) : null}
-
-            {/* 订阅仓库列表 */}
-            {subscriptions.map(fullName => {
-              const info = releaseMap[fullName] ?? Object.entries(releaseMap).find(([k]) => k.toLowerCase() === fullName.toLowerCase())?.[1]
-              const hasNew = Boolean(info && !info.seen)
-              return (
-                <HStack
-                  key={fullName}
-                  spacing={10}
-                  padding={DESIGN.inset}
-                  frame={{ maxWidth: "infinity", alignment: "leading" }}
-                  glassEffect={GLASS.content}
-                >
-                  {/* 轻点卡片查看 Releases，其余操作收进菜单，避免多个按钮在窄屏挤成竖排。 */}
-                  <Button action={() => { void openRepoReleases(fullName) }} buttonStyle="plain" accessibilityLabel={`查看 ${fullName} 的 Releases`} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-                    <HStack spacing={10} alignment="top" frame={{ maxWidth: "infinity", alignment: "leading" }}>
-                      <Image
-                        systemName={hasNew ? "bell.badge.fill" : "shippingbox.fill"}
-                        foregroundStyle={hasNew ? "systemRed" : "systemBlue"}
-                        font={20}
-                        frame={{ width: 28, height: 28, alignment: "center" }}
-                      />
-                      <VStack spacing={4} alignment="leading" frame={{ maxWidth: "infinity", alignment: "leading" }}>
-                        <HStack spacing={6} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-                          <Text font={16} fontWeight="semibold" foregroundStyle="label" lineLimit={1}>{fullName}</Text>
-                          {hasNew ? (
-                            <Text font={11} fontWeight="semibold" foregroundStyle="systemRed" padding={{ horizontal: 7, vertical: 2 }} glassEffect={GLASS.capsule}>新版本</Text>
-                          ) : null}
-                        </HStack>
-                        {info ? (
-                          <Text font={13} foregroundStyle="secondaryLabel" lineLimit={2}>
-                            {`${info.tag} · ${info.name || "（无标题）"}${info.publishedAt ? ` · ${relativeTime(info.publishedAt)}` : ""}`}
-                          </Text>
-                        ) : (
-                          <Text font={13} foregroundStyle="tertiaryLabel">尚未获取 Release，点击「检查新版本」</Text>
-                        )}
-                      </VStack>
-                    </HStack>
-                  </Button>
-                  <Menu label={<Image systemName="ellipsis.circle" font={20} foregroundStyle="secondaryLabel" frame={{ minWidth: DESIGN.touch, minHeight: DESIGN.touch }} accessibilityLabel="更多操作" />}>
-                    <Button title="查看 Releases" systemImage="shippingbox" action={() => { void openRepoReleases(fullName) }} />
-                    {info?.htmlUrl ? <Button title="在网页打开" systemImage="safari" action={() => { void openGitHubWebPage(info.htmlUrl, fullName) }} /> : null}
-                    {hasNew ? <Button title="标为已读" systemImage="checkmark" action={() => handleMarkRead(fullName)} /> : null}
-                    <Button title="取消订阅" systemImage="bell.slash" role="destructive" action={() => handleUnsubscribe(fullName)} />
-                  </Menu>
-                </HStack>
-              )
-            })}
-          </VStack>
-        </Section>
-      </List>
-    </PageBackground>
+          {/* 订阅仓库列表 */}
+          {subscriptions.map(fullName => {
+            const info = releaseMap[fullName] ?? Object.entries(releaseMap).find(([k]) => k.toLowerCase() === fullName.toLowerCase())?.[1]
+            const hasNew = Boolean(info && !info.seen)
+            return (
+              <HStack
+                key={fullName}
+                spacing={10}
+                padding={DESIGN.inset}
+                frame={{ maxWidth: "infinity", alignment: "leading" }}
+                glassEffect={GLASS.content}
+              >
+                {/* 轻点卡片查看 Releases，其余操作收进菜单，避免多个按钮在窄屏挤成竖排。 */}
+                <Button action={() => { void openRepoReleases(fullName) }} buttonStyle="plain" accessibilityLabel={`查看 ${fullName} 的 Releases`} frame={{ maxWidth: "infinity", alignment: "leading" }}>
+                  <HStack spacing={10} alignment="top" frame={{ maxWidth: "infinity", alignment: "leading" }}>
+                    <Image
+                      systemName={hasNew ? "bell.badge.fill" : "shippingbox.fill"}
+                      foregroundStyle={hasNew ? "systemRed" : ACCENT}
+                      font={20}
+                      frame={{ width: 28, height: 28, alignment: "center" }}
+                    />
+                    <VStack spacing={4} alignment="leading" frame={{ maxWidth: "infinity", alignment: "leading" }}>
+                      <HStack spacing={6} frame={{ maxWidth: "infinity", alignment: "leading" }}>
+                        <Text font={16} fontWeight="semibold" foregroundStyle="label" lineLimit={1}>{fullName}</Text>
+                        {hasNew ? (
+                          <Text font={11} fontWeight="semibold" foregroundStyle="systemRed" padding={{ horizontal: 7, vertical: 2 }} glassEffect={GLASS.capsule}>新版本</Text>
+                        ) : null}
+                      </HStack>
+                      {info ? (
+                        <Text font={13} foregroundStyle="secondaryLabel" lineLimit={2}>
+                          {`${info.tag} · ${info.name || "（无标题）"}${info.publishedAt ? ` · ${relativeTime(info.publishedAt)}` : ""}`}
+                        </Text>
+                      ) : (
+                        <Text font={13} foregroundStyle="tertiaryLabel">尚未获取 Release，点击「检查新版本」</Text>
+                      )}
+                    </VStack>
+                  </HStack>
+                </Button>
+                <Menu label={<Image systemName="ellipsis.circle" font={20} foregroundStyle="secondaryLabel" frame={{ minWidth: DESIGN.touch, minHeight: DESIGN.touch }} accessibilityLabel="更多操作" />}>
+                  <Button title="查看 Releases" systemImage="shippingbox" action={() => { void openRepoReleases(fullName) }} />
+                  {info?.htmlUrl ? <Button title="在网页打开" systemImage="safari" action={() => { void openGitHubWebPage(info.htmlUrl, fullName) }} /> : null}
+                  {hasNew ? <Button title="标为已读" systemImage="checkmark" action={() => handleMarkRead(fullName)} /> : null}
+                  <Button title="取消订阅" systemImage="bell.slash" role="destructive" action={() => handleUnsubscribe(fullName)} />
+                </Menu>
+              </HStack>
+            )
+          })}
+        </VStack>
+      </Section>
+    </List>
   )
 }
 

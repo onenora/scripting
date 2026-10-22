@@ -7,7 +7,7 @@
     "name": "onenora",
     "email": null
   },
-  "icon": "textformat",
+  "icon": "f.cursive",
   "localizedDescriptions": {
     "fr": "",
     "zh": "",
@@ -20,14 +20,14 @@
     "pt": ""
   },
   "runInApp": false,
-  "color": "rgba(79, 70, 229, 1.00)",
+  "color": "rgba(88, 86, 214, 1.00)",
   "contributors": [],
   "remoteResource": {
     "url": "https://github.com/onenora/scripting/fonts-installer",
     "autoUpdateInterval": 86400,
     "hash": ""
   },
-  "version": "3.0.1",
+  "version": "3.1.0",
   "name": "Fonts Installer",
   "entry": "index.tsx",
   "intentInputTypes": [
@@ -35,7 +35,7 @@
   ],
   "localizedNames": {
     "fr": "",
-    "zh": "",
+    "zh": "字体安装",
     "es": "",
     "ru": "",
     "en": "",

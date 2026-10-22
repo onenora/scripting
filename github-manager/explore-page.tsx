@@ -12,7 +12,7 @@ import {
 } from "scripting"
 import { readAccessMode, readCachedSearchRepositories, searchRepositories } from "./github-api"
 import { useFavorites } from "./favorites"
-import { errorStatusDetail, GLASS, HeaderIconButton, MODE_STYLE, ModeBadge, PageBackground, StatusSurface } from "./glass-ui"
+import { ACCENT, errorStatusDetail, GLASS, HeaderIconButton, MODE_STYLE, ModeBadge, StatusSurface } from "./glass-ui"
 import { RepositoryRow } from "./repository-browser"
 import type { AccessMode, GitHubRepository, LoadState } from "./types"
 
@@ -58,6 +58,7 @@ export function ExplorePage({ mode = readAccessMode(), onSubscriptionsChange }: 
       listStyle="inset"
       refreshable={() => load(query, true)}
       scrollContentBackground="hidden"
+      background="systemGroupedBackground"
       scrollEdgeEffectHidden={{ edges: "top", hidden: true }}
       listRowBackground={<></>}
       listRowSeparator="hidden"
@@ -68,7 +69,7 @@ export function ExplorePage({ mode = readAccessMode(), onSubscriptionsChange }: 
         <VStack spacing={12} frame={{ maxWidth: "infinity" }} listRowBackground={<></>} listRowSeparator="hidden">
           <ExploreHeader query={query} count={repositories.length} state={state} mode={mode} onSearch={() => { void promptSearch() }} onRefresh={() => { void load(query, true) }} />
           {state === "idle" ? <StatusSurface icon="sparkles" iconForegroundStyle={MODE_STYLE.public.color} title="热门开源仓库" detail="公共浏览不会自动请求 GitHub。点击加载或使用搜索，结果会缓存 30 分钟。" action={() => { void load("") }} actionTitle="加载热门仓库" actionSystemImage="arrow.down.circle" /> : null}
-          {state === "loading" && repositories.length === 0 ? <StatusSurface icon="sparkles" title="正在加载热门开源仓库" detail="正在从 GitHub 获取热门开源仓库。" isLoading /> : null}
+          {state === "loading" && repositories.length === 0 ? <StatusSurface icon="sparkles" title="正在加载热门开源仓库" detail="正在从 GitHub 获取热门开源仓库。" loading /> : null}
           {state === "error" ? <StatusSurface icon="exclamationmark.triangle.fill" title="加载仓库失败" detail={errorStatusDetail(error, mode === "token" ? "请检查网络连接、Token 是否有效或查询语法后重试。" : "请检查网络连接或查询语法后重试；公共浏览搜索每分钟限 10 次。")} action={() => { void load(query) }} /> : null}
           {state === "loaded" && repositories.length === 0 ? <StatusSurface icon="magnifyingglass" title="未找到匹配的仓库" detail="请更换搜索关键词，或使用 owner/repository、language:swift 等查询条件。" action={() => { void promptSearch() }} /> : null}
           {repositories.map(repository => <RepositoryRow key={String(repository.id)} repository={repository} favorite={favoriteNames.has(repository.fullName.toLowerCase())} onSubscriptionsChange={onSubscriptionsChange} />)}
@@ -82,7 +83,7 @@ export function ExplorePage({ mode = readAccessMode(), onSubscriptionsChange }: 
 function ExploreHeader({ query, count, state, mode, onSearch, onRefresh }: { query: string; count: number; state: LoadState; mode: AccessMode; onSearch: () => void; onRefresh: () => void }) {
   const title = (
     <HStack spacing={8}>
-      <Image systemName="sparkles" font={15} foregroundStyle="systemBlue" />
+      <Image systemName="sparkles" font={15} foregroundStyle={ACCENT} />
       <Text font={18} fontWeight="semibold">{query ? "搜索结果" : "热门开源仓库"}</Text>
       <ModeBadge mode={mode} />
     </HStack>
@@ -109,8 +110,4 @@ function ExploreHeader({ query, count, state, mode, onSearch, onRefresh }: { que
       <Text font={12} foregroundStyle="secondaryLabel">{state === "loaded" ? `${count} 个仓库 · 轻点可浏览、收藏或查看作者` : state === "idle" ? "尚未加载" : "加载中"}</Text>
     </VStack>
   )
-}
-
-export default function ExploreRoot() {
-  return <PageBackground><ExplorePage /></PageBackground>
 }

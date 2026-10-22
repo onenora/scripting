@@ -16,7 +16,7 @@ import {
   useState,
 } from "scripting"
 import { fetchLatestActionsStatus, fetchOwnedRepositories } from "./github-api"
-import { DESIGN, errorStatusDetail, GITHUB_SYMBOL, GLASS, IconButton, openGitHubWebPage, relativeTime, RepositoryIcon, StatusSurface } from "./glass-ui"
+import { ACCENT, DESIGN, errorStatusDetail, GITHUB_SYMBOL, GLASS, IconButton, openGitHubWebPage, relativeTime, RepositoryIcon, StatusSurface } from "./glass-ui"
 import { openRepositoryFiles, openRepositoryReleases, RepositoryActionsPage } from "./repository-pages"
 import type { GitHubActionsStatus, GitHubOwnedRepository, LoadState } from "./types"
 
@@ -86,16 +86,16 @@ export function MyRepositoriesPage() {
       background="systemGroupedBackground"
       searchable={{ value: searchQuery, onChanged: setSearchQuery, placement: "toolbar", prompt: "搜索仓库名称或描述" }}
       searchToolbarBehavior="minimize"
-      toolbar={<Toolbar><ToolbarItem placement="cancellationAction"><Button title="关闭" action={dismiss} /></ToolbarItem><ToolbarItem placement="topBarTrailing"><IconButton icon="arrow.clockwise" label="刷新我的仓库" action={() => { void load() }} /></ToolbarItem></Toolbar>}
+      toolbar={<Toolbar><ToolbarItem placement="cancellationAction"><Button title="关闭" systemImage="xmark" action={dismiss} /></ToolbarItem><ToolbarItem placement="topBarTrailing"><IconButton icon="arrow.clockwise" label="刷新我的仓库" action={() => { void load() }} /></ToolbarItem></Toolbar>}
     >
       <Section listRowBackground={<></>} listRowSeparator="hidden">
         <VStack spacing={12} frame={{ maxWidth: "infinity" }} listRowBackground={<></>} listRowSeparator="hidden">
           <VStack spacing={6} alignment="leading" padding={{ horizontal: 16, vertical: 14 }} frame={{ maxWidth: "infinity", alignment: "leading" }} glassEffect={GLASS.content}>
-            <HStack spacing={8}><Image systemName="shippingbox.fill" font={15} foregroundStyle="systemBlue" /><Text font={18} fontWeight="semibold">我的仓库</Text></HStack>
+            <HStack spacing={8}><Image systemName="shippingbox.fill" font={15} foregroundStyle={ACCENT} /><Text font={18} fontWeight="semibold">我的仓库</Text></HStack>
             <Text font={13} foregroundStyle="secondaryLabel" multilineTextAlignment="leading" fixedSize={{ horizontal: false, vertical: true }}>Token 所属账户拥有的仓库（含私有），只读浏览目录、提交、Actions 与 Release。最近更新的 20 个仓库显示 Actions 状态。</Text>
             <Text font={12} fontWeight="medium" foregroundStyle="secondaryLabel">{state === "loaded" ? `${repositories.length} 个仓库 · ${privateCount} 个私有 · ${forkCount} 个 Fork` : state === "loading" ? "加载中" : "加载失败"}</Text>
           </VStack>
-          {state === "loading" && repositories.length === 0 ? <StatusSurface icon="arrow.triangle.2.circlepath" title="正在读取仓库" detail="正在从 GitHub 读取你拥有的仓库。" isLoading /> : null}
+          {state === "loading" && repositories.length === 0 ? <StatusSurface icon="arrow.triangle.2.circlepath" title="正在读取仓库" detail="正在从 GitHub 读取你拥有的仓库。" loading /> : null}
           {state === "error" ? <StatusSurface icon="exclamationmark.triangle.fill" title="无法读取仓库" detail={errorStatusDetail(error)} action={() => { void load() }} /> : null}
           {state === "loaded" && repositories.length === 0 ? <StatusSurface icon="tray" title="没有自己的仓库" detail="GitHub 没有返回当前 Token 所属账户的仓库。" /> : null}
           {state === "loaded" && repositories.length > 0 && visibleRepositories.length === 0 ? <StatusSurface icon="magnifyingglass" title="没有匹配的仓库" detail="换一个名称或描述关键词。" /> : null}
@@ -116,7 +116,7 @@ function OwnedRepositoryRow({ repository, actionsStatus }: { repository: GitHubO
         <Text font={13} foregroundStyle="secondaryLabel" frame={{ maxWidth: "infinity", alignment: "leading" }} multilineTextAlignment="leading" fixedSize={{ horizontal: false, vertical: true }}>{repository.description ?? "暂无描述"}</Text>
         {actionsStatus ? <HStack spacing={6} frame={{ maxWidth: "infinity", alignment: "leading" }}><Image systemName={actionsStatus.icon} font={11} fontWeight="semibold" foregroundStyle={actionsStatus.color} /><Text font={12} fontWeight="medium" foregroundStyle={actionsStatus.color}>{actionsStatus.label}</Text>{actionsStatus.workflowName ? <Text font={12} foregroundStyle="tertiaryLabel" lineLimit={1}>{actionsStatus.workflowName}</Text> : null}{actionsStatus.updatedAt ? <Text font={12} foregroundStyle="tertiaryLabel">{relativeTime(actionsStatus.updatedAt)}</Text> : null}</HStack> : null}
         <HStack spacing={8} frame={{ maxWidth: "infinity", alignment: "leading" }}>
-          <HStack spacing={7}><Image systemName="arrow.triangle.branch" font={11} fontWeight="semibold" foregroundStyle="systemBlue" /><Text font={12} fontWeight="medium" foregroundStyle="systemBlue">{repository.defaultBranch}</Text></HStack>
+          <HStack spacing={7}><Image systemName="arrow.triangle.branch" font={11} fontWeight="semibold" foregroundStyle={ACCENT} /><Text font={12} fontWeight="medium" foregroundStyle={ACCENT}>{repository.defaultBranch}</Text></HStack>
           {repository.fork ? <HStack spacing={5}><Image systemName="tuningfork" font={11} fontWeight="semibold" foregroundStyle="systemPurple" /><Text font={12} fontWeight="semibold" foregroundStyle="systemPurple">Fork</Text></HStack> : null}
         </HStack>
       </VStack>

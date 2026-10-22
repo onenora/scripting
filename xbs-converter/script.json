@@ -7,7 +7,7 @@
   },
   "localizedNames" : {
     "fr" : "",
-    "zh" : "",
+    "zh" : "XBS 书源转换",
     "es" : "",
     "ru" : "",
     "en" : "",
@@ -16,7 +16,7 @@
     "de" : "",
     "pt" : ""
   },
-  "version" : "1.0.0",
+  "version" : "1.1.0",
   "localizedDescriptions" : {
     "fr" : "",
     "zh" : "",
